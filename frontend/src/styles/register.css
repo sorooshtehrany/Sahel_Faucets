@@ -1,0 +1,527 @@
+/* =========================================================
+   Register Page
+========================================================= */
+
+.register-page {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    padding-top: 170px;
+    padding-bottom: 60px;
+
+    box-sizing: border-box;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: flex-start;
+
+    direction: rtl;
+
+    isolation: isolate;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   Background
+========================================================= */
+
+.register-page::before {
+
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: -2;
+
+    background-image:
+        url("/images/sky.jpeg");
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-repeat: no-repeat;
+
+    transform: scale(1.02);
+}
+
+
+/* =========================================================
+   Background Overlay
+========================================================= */
+
+.register-page::after {
+
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: -1;
+
+    background:
+        rgba(255, 255, 255, 0.05);
+}
+
+
+/* =========================================================
+   Register Glass Card
+========================================================= */
+
+.register-box {
+
+    position: relative;
+
+    width: 420px;
+
+    max-width: calc(100% - 40px);
+
+    padding:
+        34px
+        32px
+        28px;
+
+    box-sizing: border-box;
+
+    border-radius: 24px;
+
+    background:
+        rgba(255, 255, 255, 0.14);
+
+    backdrop-filter:
+        blur(15px);
+
+    -webkit-backdrop-filter:
+        blur(15px);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.28);
+
+    box-shadow:
+        0 12px 40px
+        rgba(0, 0, 0, 0.16);
+}
+
+
+/* =========================================================
+   Title
+========================================================= */
+
+.register-box h1 {
+
+    margin:
+        0 0 28px;
+
+    text-align: center;
+
+    font-size: 30px;
+
+    font-weight: 800;
+
+    color: #3f4f9f;
+
+    line-height: 1.5;
+
+    text-shadow:
+        0 2px 8px
+        rgba(255, 255, 255, 0.6);
+}
+
+
+/* =========================================================
+   Form Group
+========================================================= */
+
+.register-form-group {
+
+    margin-bottom: 16px;
+}
+
+
+/* =========================================================
+   Label
+========================================================= */
+
+.register-form-group label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    color: #43515a;
+}
+
+
+/* =========================================================
+   Input
+========================================================= */
+
+.register-form-group input {
+
+    width: 100%;
+
+    height: 44px;
+
+    padding:
+        0 14px;
+
+    box-sizing: border-box;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.35);
+
+    border-radius: 12px;
+
+    outline: none;
+
+    background:
+        rgba(255, 255, 255, 0.26);
+
+    color: #254d62;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.register-form-group input::placeholder {
+
+    color:
+        rgba(70, 80, 90, 0.58);
+}
+
+
+.register-form-group input:focus {
+
+    background:
+        rgba(255, 255, 255, 0.36);
+
+    border-color:
+        rgba(82, 82, 214, 0.45);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(82, 82, 214, 0.10);
+}
+
+
+/* =========================================================
+   Error
+========================================================= */
+
+.register-error {
+
+    margin:
+        4px 0 12px;
+
+    padding:
+        10px 12px;
+
+    border-radius: 10px;
+
+    text-align: center;
+
+    background:
+        rgba(255, 0, 0, 0.10);
+
+    color:
+        #b83d4d;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   Success
+========================================================= */
+
+.register-success {
+
+    margin:
+        4px 0 12px;
+
+    padding:
+        10px 12px;
+
+    border-radius: 10px;
+
+    text-align: center;
+
+    background:
+        rgba(50, 170, 100, 0.10);
+
+    color:
+        #2f8a5a;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   Submit Button
+========================================================= */
+
+.register-submit-button {
+
+    width: 100%;
+
+    height: 46px;
+
+    margin-top: 6px;
+
+    padding:
+        0 14px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #5252d6,
+            #3f4f9f
+        );
+
+    box-shadow:
+        0 8px 20px
+        rgba(63, 79, 159, 0.20);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+
+.register-submit-button:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 11px 25px
+        rgba(63, 79, 159, 0.28);
+}
+
+
+.register-submit-button:active {
+
+    transform:
+        translateY(0);
+}
+
+
+.register-submit-button:disabled {
+
+    opacity: 0.6;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow:
+        0 6px 15px
+        rgba(63, 79, 159, 0.12);
+}
+
+
+/* =========================================================
+   Login Button
+========================================================= */
+
+.register-login-button {
+
+    width: 100%;
+
+    margin-top: 14px;
+
+    padding:
+        8px 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #5252d6;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.register-login-button:hover {
+
+    color: #3f3fc0;
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* =========================================================
+   Tablet
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .register-page {
+
+        padding-top: 135px;
+    }
+}
+
+
+/* =========================================================
+   Medium
+========================================================= */
+
+@media (max-width: 950px) {
+
+    .register-page {
+
+        padding-top: 125px;
+
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+
+    .register-box {
+
+        width: 420px;
+
+        max-width: 100%;
+
+        padding:
+            30px
+            26px
+            26px;
+    }
+}
+
+
+/* =========================================================
+   Mobile
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .register-page {
+
+        padding-top: 105px;
+
+        padding-left: 12px;
+        padding-right: 12px;
+
+        padding-bottom: 40px;
+    }
+
+
+    .register-box {
+
+        width: 100%;
+
+        max-width: 400px;
+
+        padding:
+            25px
+            18px
+            22px;
+
+        border-radius: 20px;
+    }
+
+
+    .register-box h1 {
+
+        margin-bottom: 23px;
+
+        font-size: 24px;
+    }
+
+
+    .register-form-group {
+
+        margin-bottom: 14px;
+    }
+
+
+    .register-form-group label {
+
+        margin-bottom: 6px;
+
+        font-size: 13px;
+    }
+
+
+    .register-form-group input {
+
+        height: 43px;
+
+        font-size: 13px;
+    }
+
+
+    .register-submit-button {
+
+        height: 44px;
+
+        font-size: 15px;
+    }
+
+
+    .register-login-button {
+
+        font-size: 13px;
+    }
+}

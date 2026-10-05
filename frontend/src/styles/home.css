@@ -1,0 +1,264 @@
+/* =========================
+   Home Page
+========================= */
+
+.home-page {
+    position: relative;
+    width: 100%;
+}
+
+
+/* =========================
+   Hero
+========================= */
+
+.home-hero {
+    position: relative;
+
+    width: 100%;
+    min-height: 100vh;
+
+    background-image:
+        url("/images/light-blue-kitchen.jpeg");
+        /* url("/images/blue-kitchen.jpeg"); */
+
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================
+   Hero Content
+========================= */
+
+.home-content {
+    position: absolute;
+
+    top: 190px;
+    right: 6vw;
+
+    width: min(650px, 90%);
+
+    text-align: right;
+}
+
+
+.home-content h1 {
+    margin: 0 0 14px;
+
+    font-size: clamp(32px, 4vw, 52px);
+
+    font-weight: 800;
+
+    color: white;
+
+    text-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.55);
+}
+
+
+.home-content h2 {
+    margin: 0;
+
+    font-size: clamp(18px, 2vw, 26px);
+
+    font-weight: 500;
+
+    line-height: 1.8;
+
+    color: white;
+
+    text-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.55);
+}
+
+
+/* =========================
+   Home Introduction
+========================= */
+
+.home-intro {
+    width: 100%;
+
+    background:
+        linear-gradient(
+            180deg,
+            #a0b4ca 0%,
+            #ffffff 100%
+        );
+
+    padding: 90px 30px 100px;
+
+    box-sizing: border-box;
+}
+
+
+.home-intro-container {
+    width: 100%;
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    text-align: center;
+}
+
+
+/* =========================
+   Introduction Title
+========================= */
+
+.home-intro-container h2 {
+    margin: 0 0 30px;
+
+    font-size: clamp(28px, 3vw, 40px);
+
+    font-weight: 800;
+
+    color: #285b73;
+}
+
+
+.home-intro-container h2::after {
+    content: "";
+
+    display: block;
+
+    width: 65px;
+    height: 3px;
+
+    margin: 16px auto 0;
+
+    border-radius: 10px;
+
+    background: #5252d6;
+}
+
+
+/* =========================
+   Introduction Text
+========================= */
+
+.home-intro-container p {
+    margin: 0 auto 18px;
+
+    max-width: 800px;
+
+    font-size: 18px;
+
+    line-height: 2.2;
+
+    color: #455a64;
+}
+
+
+/* =========================
+   About Button
+========================= */
+
+.home-intro-button {
+    display: inline-block;
+
+    margin-top: 25px;
+
+    padding: 12px 28px;
+
+    border-radius: 12px;
+
+    background: #5252d6;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 8px 20px rgba(82, 82, 214, 0.20);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+}
+
+
+.home-intro-button:hover {
+    background: #4545c5;
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 25px rgba(82, 82, 214, 0.28);
+}
+
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 700px) {
+
+    .home-hero {
+        min-height: 100svh;
+    }
+
+
+    .home-content {
+        top: 140px;
+
+        right: 18px;
+        left: 18px;
+
+        width: auto;
+
+        text-align: right;
+    }
+
+
+    .home-content h1 {
+        font-size: 30px;
+
+        line-height: 1.5;
+    }
+
+
+    .home-content h2 {
+        font-size: 17px;
+
+        line-height: 1.8;
+    }
+
+
+    .home-intro {
+        padding:
+            60px
+            20px
+            70px;
+    }
+
+
+    .home-intro-container h2 {
+        font-size: 27px;
+
+        line-height: 1.6;
+    }
+
+
+    .home-intro-container p {
+        font-size: 16px;
+
+        line-height: 2.15;
+    }
+
+
+    .home-intro-button {
+        font-size: 15px;
+
+        padding: 11px 24px;
+    }
+}

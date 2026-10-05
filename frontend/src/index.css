@@ -1,0 +1,849 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Vazirmatn", sans-serif;
+    direction: rtl;
+
+    background: #dcecf5;
+
+    color: #222;
+
+    position: relative;
+}
+
+/* =========================
+   Background Image
+========================= */
+
+body::before {
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: -1;
+
+    /* background-image: url("/images/blue_kitchen_cabinets_ideas.png"); */
+    background-image: url("/images/see.jpeg");
+    /* background-image: url("/images/water-fall.jpeg"); */
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    /* opacity: 0.80; */
+}
+
+.home-page {
+    position: relative;
+    min-height: 100vh;
+}
+
+.home-page::before {
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: -1;
+
+    background-image: url("/images/light-blue-kitchen.jpeg");
+
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+body.home-active::before {
+    display: none;
+}
+
+.home-page {
+    min-height: 100vh;
+    position: relative;
+}
+
+.home-content {
+    position: absolute;
+
+    top: 120px;
+    right: 50px;
+
+    text-align: right;
+}
+
+.home-content h1 {
+    margin: 0;
+
+    font-size: 42px;
+    font-weight: 700;
+
+    color: white;
+
+    text-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.6);
+}
+/* =========================
+   Page
+========================= */
+
+.page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 50px 0px;
+}
+
+
+/* =========================
+   Series Header
+========================= */
+
+.series-header {
+    text-align: right;
+    margin-bottom: 40px;
+}
+
+.series-header h1 {
+    margin: 0;
+    font-size: 46px;
+    font-weight: 900;
+    color: #397588;
+    letter-spacing: -0.5px;
+}
+
+.finish {
+    margin-top: 14px;
+    font-size: 26px;
+    color: #349b0c;
+    font-weight: 700;
+}
+
+
+/* =========================
+   Products
+========================= */
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+
+/* =========================
+   Product Card
+========================= */
+
+.product-card {
+    background: rgba(255, 255, 255, 0.42);
+    backdrop-filter: blur(10px);
+
+    border-radius: 16px;
+    overflow: hidden;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================
+   Product Image
+========================= */
+
+.product-image {
+    width: 100%;
+    height: 380px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(127, 179, 246, 0.276);
+
+    padding: 20px;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* =========================
+   Product Info
+========================= */
+
+.product-info {
+    padding: 20px 24px 24px;
+
+    text-align: right;
+
+    background: rgba(90, 132, 176, 0.276);
+}
+
+.product-info h2 {
+    margin: 0 0 10px;
+
+    font-size: 21px;
+    font-weight: 700;
+
+    color: #244658;
+}
+
+.product-info p {
+    margin: 0;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    color: #2f556b;
+
+    text-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.product-info p span {
+    font-size: 15px;
+    font-weight: 500;
+
+    margin-right: 5px;
+
+    color: #075985;
+}
+
+
+/* =========================
+   Loading / Error
+========================= */
+
+.loading,
+.error {
+    text-align: center;
+
+    padding: 100px 20px;
+
+    font-size: 20px;
+}
+
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 700px) {
+
+    .page {
+        padding: 30px 16px;
+    }
+
+    .series-header h1 {
+        font-size: 28px;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .product-image {
+        height: 320px;
+    }
+}
+
+
+/* =========================
+   Series Navigation
+========================= */
+
+.series-navigation {
+    position: fixed;
+
+    top: 50%;
+    left: 0;
+    right: 0;
+
+    transform: translateY(-50%);
+
+    z-index: 100;
+
+    pointer-events: none;
+}
+
+.nav-arrow {
+    position: fixed;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: auto;
+    height: auto;
+
+    padding: 10px;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: rgb(168, 221, 232);
+
+    font-family: Arial, sans-serif;
+    font-size: 58px;
+    font-weight: 300;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    pointer-events: auto;
+
+    text-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.45);
+
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+
+/* فلش سمت چپ */
+
+.nav-arrow-left {
+    left: 20px;
+}
+
+
+/* فلش سمت راست */
+
+.nav-arrow-right {
+    right: 20px;
+}
+
+
+.nav-arrow:hover {
+    opacity: 0.75;
+}
+
+.nav-arrow-left:hover {
+    transform: translateY(-50%) scale(1.15);
+}
+
+.nav-arrow-right:hover {
+    transform: translateY(-50%) scale(1.15);
+}
+
+
+/* =========================
+   Series Animation
+========================= */
+
+.series-stage {
+    position: relative;
+
+    width: 100%;
+
+    overflow: hidden;
+}
+
+
+/* صفحه فعلی */
+
+.series-content {
+    position: relative;
+
+    z-index: 1;
+}
+
+
+/* =========================
+   خروج صفحه فعلی
+========================= */
+
+.series-content.slide-next {
+    animation:
+        slide-next
+        0.5s
+        ease-in-out
+        forwards;
+}
+
+.series-content.slide-previous {
+    animation:
+        slide-previous
+        0.5s
+        ease-in-out
+        forwards;
+}
+
+
+/* خروج به سمت راست */
+
+@keyframes slide-next {
+
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+}
+
+
+/* خروج به سمت چپ */
+
+@keyframes slide-previous {
+
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+}
+
+
+/* =========================
+   Incoming Series
+========================= */
+
+.incoming-wrapper {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 3;
+
+    pointer-events: none;
+}
+
+
+/* صفحه جدید داخل wrapper */
+
+.incoming-wrapper .page {
+    width: 100%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 50px 30px;
+}
+
+
+/* =========================
+   ورود از چپ
+========================= */
+
+.incoming-from-left {
+    animation:
+        incoming-from-left
+        0.5s
+        ease-in-out
+        forwards;
+}
+
+
+/* =========================
+   ورود از راست
+========================= */
+
+.incoming-from-right {
+    animation:
+        incoming-from-right
+        0.5s
+        ease-in-out
+        forwards;
+}
+
+
+/* از چپ وارد شود */
+
+@keyframes incoming-from-left {
+
+    from {
+        transform: translateX(-100vw);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+
+}
+
+
+/* از راست وارد شود */
+
+@keyframes incoming-from-right {
+
+    from {
+        transform: translateX(100vw);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+
+}
+/* =========================
+   Navbar
+========================= */
+
+.navbar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    width: 100%;
+    height: 13%;
+
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 30px;
+
+    background: rgba(225, 225, 255, 0.32);
+
+    backdrop-filter: blur(12px);
+
+    box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================
+   Menu Button
+========================= */
+
+.menu-button {
+    width: 46px;
+    height: 46px;
+
+    padding: 8px;
+
+    border: none;
+    outline: none;
+
+    background: rgba(82, 82, 214, 0.08);
+
+    border-radius: 14px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 5px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+.menu-button span {
+    display: block;
+
+    width: 23px;
+    height: 2px;
+
+    background: #5252d6;
+
+    border-radius: 10px;
+
+    transition:
+        width 0.25s ease,
+        opacity 0.25s ease;
+}
+
+.menu-button:hover {
+    background: rgba(82, 82, 214, 0.14);
+
+    transform: scale(1.05);
+}
+
+.menu-button:hover span:nth-child(1) {
+    width: 18px;
+}
+
+.menu-button:hover span:nth-child(3) {
+    width: 18px;
+}
+
+
+/* =========================
+   Logo
+========================= */
+
+.navbar-logo {
+    position: absolute;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    font-size: 24px;
+    font-weight: 800;
+
+    color: #5252d6;
+
+    white-space: nowrap;
+}
+
+
+/* =========================
+   Company Information
+========================= */
+
+.navbar-info {
+    margin-right: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 25px;
+
+    font-size: 14px;
+
+    color: #444;
+}
+
+.navbar-phone,
+.navbar-address {
+    white-space: nowrap;
+}
+
+.navbar-social {
+    color: #5252d6;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+.navbar-social:hover {
+    opacity: 0.7;
+}
+
+
+/* =========================
+   Menu Overlay
+========================= */
+
+.menu-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1100;
+
+    background: rgba(0, 0, 0, 0.25);
+
+    backdrop-filter: blur(2px);
+
+    animation: menu-overlay-show 0.3s ease forwards;
+}
+
+@keyframes menu-overlay-show {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* =========================
+   Side Menu
+========================= */
+
+.side-menu {
+    position: fixed;
+
+    top: 95px;
+    right: 25px;
+
+    width: 170px;
+
+    z-index: 1200;
+
+    padding: 24px;
+
+    background: rgba(117, 151, 178, 0.54);
+
+    backdrop-filter: blur(18px);
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.18);
+
+    animation: menu-waterfall 0.45s ease-out forwards;
+
+    transform-origin: top right;
+}
+
+
+/* =========================
+   Menu Opening Animation
+========================= */
+
+@keyframes menu-waterfall {
+
+    0% {
+        opacity: 0;
+        transform:
+            translateY(-25px)
+            scaleY(0.2);
+    }
+
+    60% {
+        opacity: 1;
+        transform:
+            translateY(4px)
+            scaleY(1.03);
+    }
+
+    100% {
+        opacity: 1;
+        transform:
+            translateY(0)
+            scaleY(1);
+    }
+}
+/* =========================
+   Menu Links
+========================= */
+
+.side-menu-links {
+    display: flex;
+
+    flex-direction: column;
+
+    margin-top: 25px;
+
+    gap: 7px;
+}
+
+/* =========================
+   Waterfall Items
+========================= */
+
+.side-menu-links a {
+    padding: 12px 14px;
+
+    color: #333;
+
+    text-decoration: none;
+
+    font-size: 17px;
+    font-weight: 600;
+
+    border-radius: 10px;
+
+    opacity: 0;
+
+    transform:
+        translateY(-18px);
+
+    animation:
+        menu-item-waterfall
+        0.45s
+        ease-out
+        forwards;
+}
+
+
+/* هر آیتم کمی بعد از قبلی */
+
+.side-menu-links a:nth-child(1) {
+    animation-delay: 0.08s;
+}
+
+.side-menu-links a:nth-child(2) {
+    animation-delay: 0.16s;
+}
+
+.side-menu-links a:nth-child(3) {
+    animation-delay: 0.24s;
+}
+
+.side-menu-links a:nth-child(4) {
+    animation-delay: 0.32s;
+}
+
+.side-menu-links a:nth-child(5) {
+    animation-delay: 0.40s;
+}
+
+
+@keyframes menu-item-waterfall {
+
+    from {
+        opacity: 0;
+        transform:
+            translateY(-18px);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0);
+    }
+}
+
+
+/* =========================
+   Menu Hover
+========================= */
+
+.side-menu-links a:hover {
+    background: rgba(82, 82, 214, 0.08);
+
+    color: #5252d6;
+
+    transform: translateX(-4px);
+}
+
+
+/* =========================
+   Page Offset
+========================= */
+
+.series-stage {
+    position: relative;
+
+    width: 100%;
+
+    overflow: hidden;
+
+    padding-top: 80px;
+}

@@ -1,0 +1,70 @@
+
+
+/* =========================
+   Series Navigation
+========================= */
+
+.series-navigation {
+    position: fixed;
+
+    top: 50%;
+    left: 0;
+    right: 0;
+
+    transform: translateY(-50%);
+
+    z-index: 100;
+
+    pointer-events: none;
+}
+
+.nav-arrow {
+    position: fixed;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: auto;
+    height: auto;
+
+    padding: 10px;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: rgb(168, 221, 232);
+
+    font-family: Arial, sans-serif;
+    font-size: 58px;
+    font-weight: 300;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    pointer-events: auto;
+
+    text-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.45);
+
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+
+/* فلش سمت چپ */
+
+.nav-arrow-left {
+    left: 20px;
+}
+
+
+/* فلش سمت راست */
+
+.nav-arrow-right {
+    right: 20px;
+}

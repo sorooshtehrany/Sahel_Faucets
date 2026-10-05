@@ -1,0 +1,168 @@
+
+/* خروج به سمت راست */
+
+@keyframes slide-next {
+
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+}
+
+
+/* خروج به سمت چپ */
+
+@keyframes slide-previous {
+
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+}
+
+
+/* از چپ وارد شود */
+
+@keyframes incoming-from-left {
+
+    from {
+        transform: translateX(-100vw);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+
+}
+
+
+/* از راست وارد شود */
+
+@keyframes incoming-from-right {
+
+    from {
+        transform: translateX(100vw);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+
+}
+
+
+@keyframes menu-overlay-show {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* =========================
+   Menu Opening Animation
+========================= */
+
+@keyframes menu-waterfall {
+
+    0% {
+        opacity: 0;
+        transform:
+            translateY(-25px)
+            scaleY(0.2);
+    }
+
+    60% {
+        opacity: 1;
+        transform:
+            translateY(4px)
+            scaleY(1.03);
+    }
+
+    100% {
+        opacity: 1;
+        transform:
+            translateY(0)
+            scaleY(1);
+    }
+}
+
+
+@keyframes menu-item-waterfall {
+
+    from {
+        opacity: 0;
+        transform:
+            translateY(-18px);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0);
+    }
+}
+
+
+
+/* =========================
+   خروج صفحه فعلی
+========================= */
+
+.series-content.slide-next {
+    animation:
+        slide-next
+        0.5s
+        ease-in-out
+        forwards;
+}
+
+.series-content.slide-previous {
+    animation:
+        slide-previous
+        0.5s
+        ease-in-out
+        forwards;
+}
+
+
+/* =========================
+   ورود از چپ
+========================= */
+
+.incoming-from-left {
+    animation:
+        incoming-from-left
+        0.5s
+        ease-in-out
+        forwards;
+}
+
+
+/* =========================
+   ورود از راست
+========================= */
+
+.incoming-from-right {
+    animation:
+        incoming-from-right
+        0.5s
+        ease-in-out
+        forwards;
+}

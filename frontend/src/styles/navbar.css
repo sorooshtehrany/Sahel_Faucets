@@ -1,0 +1,1077 @@
+/* =========================
+   Navbar
+========================= */
+
+.navbar {
+    --search-h: 42px;
+    --search-w: clamp(180px, 18vw, 280px);
+    --auth-h: 30px;
+    --row-gap: 6px;
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    width: 100%;
+    height: clamp(96px, 15vh, 130px);
+
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 30px;
+
+    box-sizing: border-box;
+
+    direction: rtl;
+
+    background: rgba(225, 225, 255, 0.32);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================
+   Right Group
+   Topology:
+                      [ auth ]
+        [ menu ]      [ search ]
+========================= */
+
+.navbar-right {
+    position: relative;
+
+    display: flex;
+
+    /* menu and search share the bottom row */
+    align-items: flex-end;
+
+    gap: 14px;
+
+    flex-shrink: 0;
+
+    z-index: 1100;
+}
+
+
+.navbar-menu-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: var(--row-gap);
+
+    flex-shrink: 0;
+}
+
+
+/* Top row: same height as the auth row */
+
+.navbar-cart-slot {
+    height: var(--auth-h);
+    min-width: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Bottom row: same height as the search box */
+
+.navbar-menu-button-slot {
+    height: var(--search-h);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================
+   Cart
+========================= */
+
+.navbar-cart {
+    position: relative;
+
+    width: var(--auth-h);
+    height: var(--auth-h);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-decoration: none;
+
+    border-radius: 9px;
+
+    transition:
+        transform 0.25s ease,
+        color 0.25s ease,
+        background 0.25s ease;
+}
+
+
+.navbar-cart svg {
+    width: 24px;
+    height: 24px;
+
+    display: block;
+}
+
+
+.navbar-cart.is-empty {
+    color: #777;
+}
+
+
+.navbar-cart.has-items {
+    color: #5252d6;
+}
+
+
+.navbar-cart:hover {
+    color: #3f3fc0;
+    background: rgba(82, 82, 214, 0.08);
+    transform: scale(1.08);
+}
+
+
+.cart-badge {
+    position: absolute;
+
+    top: -3px;
+    right: -5px;
+
+    min-width: 18px;
+    height: 18px;
+
+    padding: 0 5px;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+
+    background: #d14b5b;
+    color: #fff;
+
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+
+    pointer-events: none;
+}
+
+
+.navbar-right .menu-button {
+    flex-shrink: 0;
+}
+
+
+.navbar-right-column {
+    width: var(--search-w);
+
+    display: flex;
+    flex-direction: column;
+
+    /* in RTL, flex-start = right edge: auth and search share it */
+    align-items: flex-start;
+
+    gap: var(--row-gap);
+}
+
+
+/* =========================
+   Authentication
+========================= */
+
+.navbar-auth {
+    width: 100%;
+    min-height: var(--auth-h);
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 7px;
+
+    box-sizing: border-box;
+}
+
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #5252d6;
+
+    flex-shrink: 0;
+}
+
+
+.user-icon {
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #5252d6;
+
+    flex-shrink: 0;
+}
+
+
+.user-icon svg,
+.navbar-login svg {
+    width: 23px;
+    height: 23px;
+
+    display: block;
+}
+
+
+.user-name {
+    min-width: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #4b4b4b;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* Login */
+
+.navbar-login {
+    width: var(--auth-h);
+    height: var(--auth-h);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #5252d6;
+
+    text-decoration: none;
+
+    border-radius: 9px;
+
+    transition:
+        transform 0.25s ease,
+        color 0.25s ease,
+        background 0.25s ease;
+}
+
+
+.navbar-login:hover {
+    color: #3f3fc0;
+    background: rgba(82, 82, 214, 0.08);
+    transform: scale(1.08);
+}
+
+
+/* Logout */
+
+.navbar-logout {
+    width: 30px;
+    height: 30px;
+
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+    color: #777;
+
+    cursor: pointer;
+
+    flex-shrink: 0;
+
+    transition:
+        color 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.navbar-logout svg {
+    width: 20px;
+    height: 20px;
+
+    display: block;
+}
+
+
+.navbar-logout:hover {
+    color: #d14b5b;
+    background: rgba(209, 75, 91, 0.08);
+    transform: scale(1.08);
+}
+
+
+/* =========================
+   Brand
+========================= */
+
+.navbar-brand {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    white-space: nowrap;
+
+    pointer-events: none;
+
+    z-index: 1;
+}
+
+
+.navbar-brand-title {
+    font-size: clamp(22px, 2vw, 36px);
+    font-weight: 800;
+    color: #3f4f9f;
+    line-height: 1.5;
+    text-shadow: 0 2px 8px rgba(255, 255, 255, 0.7);
+}
+
+
+.navbar-brand-subtitle {
+    margin-top: 5px;
+
+    font-size: clamp(10px, 0.9vw, 16px);
+    font-weight: 800;
+    color: #667085;
+    line-height: 1.5;
+}
+
+
+/* =========================
+   Navbar Information
+========================= */
+
+.navbar-info {
+    /* pushes the info block to the far left in RTL */
+    margin-right: auto;
+
+    display: flex;
+    align-items: center;
+
+    gap: 22px;
+
+    font-size: 13px;
+    color: #444;
+
+    flex-shrink: 0;
+}
+
+
+/* Location */
+
+.navbar-location {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 7px;
+
+    color: #4b4b4b;
+
+    text-decoration: none;
+    white-space: nowrap;
+
+    transition:
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.navbar-location:hover {
+    color: #5252d6;
+    transform: translateY(-1px);
+}
+
+
+.location-icon {
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #5252d6;
+
+    flex-shrink: 0;
+}
+
+
+.location-icon svg {
+    width: 23px;
+    height: 23px;
+
+    display: block;
+}
+
+
+.location-text {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* Phones */
+
+.navbar-phones {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 5px;
+
+    flex-shrink: 0;
+}
+
+
+.navbar-phone {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    color: #4b4b4b;
+
+    text-decoration: none;
+    white-space: nowrap;
+
+    transition:
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.navbar-phone:hover {
+    color: #5252d6;
+    transform: translateX(-2px);
+}
+
+
+.phone-icon {
+    width: 21px;
+    height: 21px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 15px;
+
+    flex-shrink: 0;
+}
+
+
+/* Phone numbers must remain LTR */
+
+.phone-number {
+    direction: ltr;
+    unicode-bidi: isolate;
+
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    letter-spacing: 0;
+    white-space: nowrap;
+}
+
+
+/* Socials */
+
+.navbar-socials {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    margin-right: 3px;
+
+    flex-shrink: 0;
+}
+
+
+.social-icon {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #5252d6;
+
+    text-decoration: none;
+
+    border-radius: 9px;
+
+    transition:
+        transform 0.25s ease,
+        color 0.25s ease,
+        background 0.25s ease;
+}
+
+
+.social-icon svg {
+    width: 21px;
+    height: 21px;
+
+    display: block;
+}
+
+
+.social-icon:hover {
+    transform: scale(1.15);
+    background: rgba(82, 82, 214, 0.08);
+}
+
+
+.social-icon.instagram:hover {
+    color: #d62976;
+}
+
+
+.social-icon.telegram:hover {
+    color: #229ed9;
+}
+
+
+/* =============================
+   Product Search
+============================= */
+
+.product-search {
+    position: relative;
+
+    width: 100%;
+
+    direction: rtl;
+
+    z-index: 100;
+
+    flex-shrink: 0;
+}
+
+
+.product-search-box {
+    position: relative;
+
+    width: 100%;
+}
+
+
+.product-search-box input {
+    width: 100%;
+    height: var(--search-h);
+
+    box-sizing: border-box;
+
+    padding: 0 42px 0 14px;
+
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.18);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    color: #1f526c;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.product-search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+
+.product-search-box input:focus {
+    background: rgba(255, 255, 255, 0.25);
+
+    border-color: rgba(255, 255, 255, 0.75);
+
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.10),
+        0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+
+.product-search-icon {
+    position: absolute;
+
+    right: 13px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    font-size: 16px;
+
+    pointer-events: none;
+
+    opacity: 0.9;
+}
+
+
+/* =============================
+   Search Results
+============================= */
+
+.product-search-results,
+.product-search-loading,
+.product-search-empty {
+    position: absolute;
+
+    top: calc(100% + 8px);
+    right: 0;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border-radius: 14px;
+
+    background: rgba(219, 220, 239, 0.95);
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+
+    overflow: hidden;
+}
+
+
+.product-search-results {
+    max-height: 320px;
+
+    overflow-y: auto;
+
+    overscroll-behavior: contain;
+}
+
+
+.product-search-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+
+.product-search-results::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.product-search-results::-webkit-scrollbar-thumb {
+    background: rgba(75, 127, 143, 0.45);
+    border-radius: 10px;
+}
+
+
+.product-search-results::-webkit-scrollbar-thumb:hover {
+    background: rgba(75, 127, 143, 0.65);
+}
+
+
+/* Individual result */
+
+.product-search-result {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    min-height: 48px;
+
+    padding: 8px 14px;
+
+    box-sizing: border-box;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.product-search-result:hover {
+    background: rgba(82, 82, 214, 0.10);
+}
+
+
+.product-search-result-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 3px;
+}
+
+
+.product-search-result-name {
+    color: #285b73;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+.product-search-result-series {
+    color: #71828a;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* Loading / Empty */
+
+.product-search-loading,
+.product-search-empty {
+    padding: 14px;
+
+    text-align: center;
+
+    color: #4b6570;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* Selected result */
+
+.product-search-result.selected {
+    background: rgba(82, 82, 214, 0.16);
+}
+
+
+.product-search-result.selected .product-search-result-name {
+    color: #2852a0;
+}
+
+
+.product-search-result.selected .product-search-result-series {
+    color: #526b78;
+}
+
+
+/* =========================================================
+   Tablet / Medium Width
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .navbar {
+        --search-w: clamp(180px, 21vw, 230px);
+
+        height: 92px;
+
+        padding: 0 22px;
+    }
+
+
+    .navbar-info {
+        gap: 15px;
+    }
+
+
+    .navbar-brand-title {
+        font-size: 22px;
+    }
+
+
+    .navbar-brand-subtitle {
+        font-size: 10px;
+    }
+}
+
+
+/* =========================================================
+   Hide Brand Before Any Collision
+========================================================= */
+
+@media (max-width: 950px) {
+
+    .navbar {
+        --search-h: 38px;
+        --search-w: clamp(180px, 24vw, 220px);
+
+        height: 88px;
+
+        padding: 0 18px;
+    }
+
+
+    .navbar-brand {
+        display: none;
+    }
+
+
+    .navbar-right {
+        gap: 12px;
+    }
+
+
+    .navbar-info {
+        gap: 12px;
+    }
+
+
+    .navbar-location .location-text {
+        display: none;
+    }
+
+
+    .navbar-phones {
+        gap: 3px;
+    }
+
+
+    .phone-number {
+        font-size: 12px;
+    }
+
+
+    .phone-icon {
+        font-size: 13px;
+    }
+
+
+    .social-icon {
+        width: 29px;
+        height: 29px;
+    }
+
+
+    .social-icon svg {
+        width: 19px;
+        height: 19px;
+    }
+
+
+    .product-search-box input {
+        font-size: 13px;
+    }
+
+
+    .product-search-result-name {
+        font-size: 13px;
+    }
+
+
+    .product-search-result-series {
+        font-size: 10px;
+    }
+}
+
+
+/* =========================================================
+   Mobile
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .navbar {
+        --search-h: 36px;
+        --search-w: clamp(140px, 34vw, 170px);
+
+        height: 84px;
+
+        padding: 0 12px;
+    }
+
+
+    .navbar-right {
+        gap: 10px;
+    }
+
+
+    .navbar-info {
+        gap: 8px;
+    }
+
+
+    .navbar-phones {
+        gap: 2px;
+    }
+
+
+    .phone-number {
+        font-size: 11px;
+    }
+
+
+    .phone-icon {
+        display: none;
+    }
+
+
+    .location-icon {
+        width: 25px;
+        height: 25px;
+    }
+
+
+    .location-icon svg {
+        width: 21px;
+        height: 21px;
+    }
+
+
+    .user-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+
+    .user-icon svg,
+    .navbar-login svg {
+        width: 21px;
+        height: 21px;
+    }
+
+
+    .navbar-login {
+        width: 28px;
+        height: 28px;
+    }
+
+
+    .navbar-logout {
+        width: 27px;
+        height: 27px;
+    }
+
+
+    .navbar-logout svg {
+        width: 18px;
+        height: 18px;
+    }
+
+
+    .social-icon {
+        width: 27px;
+        height: 27px;
+    }
+
+
+    .social-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+
+    .product-search-box input {
+        padding-right: 38px;
+        font-size: 12px;
+    }
+
+
+    .product-search-icon {
+        right: 11px;
+        font-size: 14px;
+    }
+
+
+    .product-search-result {
+        padding: 9px 12px;
+    }
+
+
+    .product-search-results,
+    .product-search-loading,
+    .product-search-empty {
+        border-radius: 12px;
+    }
+
+
+    .product-search-results {
+        max-height: 260px;
+    }
+}
+
+
+/* =========================================================
+   Small Phones: hide phone numbers so nothing overlaps
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .navbar-phones {
+        display: none;
+    }
+}
+
+
+/* =========================================================
+   Mobile: cart sizing (matches login icon)
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .navbar-cart {
+        width: 28px;
+        height: 28px;
+    }
+
+
+    .navbar-cart svg {
+        width: 22px;
+        height: 22px;
+    }
+
+
+    .cart-badge {
+        min-width: 16px;
+        height: 16px;
+
+        font-size: 10px;
+    }
+}
