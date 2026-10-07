@@ -1166,129 +1166,129 @@ function Cart() {
 
                             <div className="cart-actions">
 
-{
-    paymentStarted ? (
+                                {
+                                    paymentStarted ? (
 
-        <>
-            {/* ---------------------------------
+                                        <>
+                                            {/* ---------------------------------
                Cancel Pending Order
             --------------------------------- */}
 
-            <button
-                type="button"
-                className="cart-back-button"
-                onClick={
-                    handleCancelPendingOrder
-                }
-                disabled={
-                    actionLoading ||
-                    checkoutLoading
-                }
-            >
+                                            <button
+                                                type="button"
+                                                className="cart-back-button"
+                                                onClick={
+                                                    handleCancelPendingOrder
+                                                }
+                                                disabled={
+                                                    actionLoading ||
+                                                    checkoutLoading
+                                                }
+                                            >
 
-                {
-                    actionLoading
-                        ? "در حال لغو..."
-                        : "لغو سفارش"
-                }
+                                                {
+                                                    actionLoading
+                                                        ? "در حال لغو..."
+                                                        : "لغو سفارش"
+                                                }
 
-            </button>
+                                            </button>
 
 
-            {/* ---------------------------------
+                                            {/* ---------------------------------
                Continue Payment
             --------------------------------- */}
 
-            <button
-                type="button"
-                className="cart-checkout-button"
-                onClick={
-                    handleContinuePayment
-                }
-                disabled={
-                    actionLoading ||
-                    checkoutLoading
-                }
-            >
+                                            <button
+                                                type="button"
+                                                className="cart-checkout-button"
+                                                onClick={
+                                                    handleContinuePayment
+                                                }
+                                                disabled={
+                                                    actionLoading ||
+                                                    checkoutLoading
+                                                }
+                                            >
 
-                {
-                    checkoutLoading
-                        ? "در حال پردازش..."
-                        : "ادامه پرداخت"
-                }
+                                                {
+                                                    checkoutLoading
+                                                        ? "در حال پردازش..."
+                                                        : "ادامه پرداخت"
+                                                }
 
-            </button>
+                                            </button>
 
-        </>
+                                        </>
 
-    ) : (
+                                    ) : (
 
-        <>
-            {/* ---------------------------------
+                                        <>
+                                            {/* ---------------------------------
                Continue Shopping
             --------------------------------- */}
 
-            <button
-                type="button"
-                className="cart-continue-button"
-                onClick={() => {
+                                            <button
+                                                type="button"
+                                                className="cart-continue-button"
+                                                onClick={() => {
 
-                    const lastPage =
-                        localStorage.getItem(
-                            "lastShoppingPage"
-                        );
+                                                    const lastPage =
+                                                        localStorage.getItem(
+                                                            "lastShoppingPage"
+                                                        );
 
-                    navigate(
-                        lastPage ||
-                        "/series"
-                    );
+                                                    navigate(
+                                                        lastPage ||
+                                                        "/series"
+                                                    );
 
-                }}
-                disabled={
-                    actionLoading ||
-                    checkoutLoading
-                }
-            >
-                ادامه خرید
-            </button>
+                                                }}
+                                                disabled={
+                                                    actionLoading ||
+                                                    checkoutLoading
+                                                }
+                                            >
+                                                ادامه خرید
+                                            </button>
 
 
-            {/* ---------------------------------
+                                            {/* ---------------------------------
                Checkout
             --------------------------------- */}
 
-            <button
-                type="button"
-                className="cart-checkout-button"
-                onClick={
-                    handleCheckout
-                }
-                disabled={
-                    actionLoading ||
-                    checkoutLoading
-                }
-            >
+                                            <button
+                                                type="button"
+                                                className="cart-checkout-button"
+                                                onClick={
+                                                    handleCheckout
+                                                }
+                                                disabled={
+                                                    actionLoading ||
+                                                    checkoutLoading
+                                                }
+                                            >
 
-                {
-                    checkoutLoading
+                                                {
+                                                    checkoutLoading
 
-                        ? "در حال پردازش..."
+                                                        ? "در حال پردازش..."
 
-                        : pendingOrder
+                                                        : pendingOrder
 
-                            ? "ادامه ثبت سفارش"
+                                                            ? "ادامه ثبت سفارش"
 
-                            : "ادامه و ثبت سفارش"
-                }
+                                                            : "ادامه و ثبت سفارش"
+                                                }
 
-            </button>
+                                            </button>
 
-        </>
+                                        </>
 
-    )
-}
+                                    )
+                                }
 
-</div>
+                            </div>
 
                         </div>
 

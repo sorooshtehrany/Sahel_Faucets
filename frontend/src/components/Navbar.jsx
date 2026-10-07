@@ -281,11 +281,10 @@ function Navbar() {
                             {isAuthenticated && (
                                 <Link
                                     to="/cart"
-                                    className={`navbar-cart ${
-                                        cartItemCount > 0
+                                    className={`navbar-cart ${cartItemCount > 0
                                             ? "has-items"
                                             : "is-empty"
-                                    }`}
+                                        }`}
                                     aria-label="سبد خرید"
                                     title="سبد خرید"
                                 >
@@ -477,6 +476,12 @@ function Navbar() {
                             </Link>
 
                             <Link to="#">تماس با ما</Link>
+
+                            {isAuthenticated && user?.role === "admin" && (
+                                <Link to="/admin" onClick={closeMenu}>
+                                    پنل مدیریت
+                                </Link>
+                            )}
 
                             {isAuthenticated ? (
                                 <Link to="/login" onClick={handleLogout}>

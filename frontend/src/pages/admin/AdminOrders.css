@@ -1,0 +1,370 @@
+/* =========================
+   Admin Orders
+========================= */
+
+.admin-orders {
+    width: 100%;
+}
+
+
+/* =========================
+   Page Header
+========================= */
+
+.admin-page-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 25px;
+}
+
+
+.admin-page-header h2 {
+    margin: 0 0 7px;
+
+    font-size: 24px;
+
+    font-weight: 800;
+
+    color: #1e293b;
+}
+
+
+.admin-page-header p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   Filter
+========================= */
+
+.admin-filter select {
+    min-width: 190px;
+
+    padding: 11px 14px;
+
+    border:
+        1px solid #dbe3ec;
+
+    border-radius: 11px;
+
+    background: white;
+
+    color: #334155;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+
+.admin-filter select:focus {
+    border-color: #3b82f6;
+}
+
+
+/* =========================
+   Table Card
+========================= */
+
+.admin-table-card {
+    overflow: hidden;
+
+    background:
+        rgba(255, 255, 255, 0.9);
+
+    border:
+        1px solid rgba(148, 163, 184, 0.15);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(15, 23, 42, 0.05);
+}
+
+
+.admin-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+/* =========================
+   Table
+========================= */
+
+.admin-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 750px;
+}
+
+
+.admin-table th {
+    padding: 17px 20px;
+
+    text-align: right;
+
+    background: #f8fafc;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    border-bottom:
+        1px solid #e2e8f0;
+}
+
+
+.admin-table td {
+    padding: 18px 20px;
+
+    color: #334155;
+
+    font-size: 14px;
+
+    border-bottom:
+        1px solid #f1f5f9;
+}
+
+
+/* =========================
+   Clickable Order Row
+========================= */
+
+.admin-order-row {
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease;
+}
+
+
+.admin-order-row:hover {
+    background: #f8fafc;
+}
+
+
+.admin-order-row:active {
+    background: #f1f5f9;
+}
+
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =========================
+   Customer
+========================= */
+
+.customer-cell {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.customer-cell strong {
+    font-size: 14px;
+
+    color: #334155;
+}
+
+
+.customer-cell small {
+    font-size: 12px;
+
+    color: #94a3b8;
+}
+
+
+/* =========================
+   Price
+========================= */
+
+.currency {
+    margin-right: 5px;
+
+    font-size: 11px;
+
+    color: #94a3b8;
+}
+
+
+/* =========================
+   Status
+========================= */
+
+.order-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 6px 11px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.order-status.paid {
+    background: #dcfce7;
+
+    color: #15803d;
+}
+
+
+.order-status.pending {
+    background: #fef3c7;
+
+    color: #b45309;
+}
+
+
+.order-status.failed {
+    background: #fee2e2;
+
+    color: #dc2626;
+}
+
+
+.order-status.cancelled {
+    background: #e2e8f0;
+
+    color: #475569;
+}
+
+
+/* =========================
+   Loading / Empty
+========================= */
+
+.admin-table-loading,
+.admin-empty {
+    padding: 60px 20px;
+
+    text-align: center;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   Pagination
+========================= */
+
+.admin-pagination {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 20px;
+
+    margin-top: 22px;
+}
+
+
+.admin-pagination button {
+    min-width: 80px;
+
+    padding: 9px 15px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-family: inherit;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.admin-pagination button:hover:not(:disabled) {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+
+.admin-pagination button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+
+.admin-pagination button:disabled {
+    background: #e2e8f0;
+
+    color: #94a3b8;
+
+    cursor: not-allowed;
+}
+
+
+.admin-pagination span {
+    font-size: 13px;
+
+    color: #64748b;
+}
+
+
+.admin-pagination strong {
+    color: #334155;
+}
+
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 700px) {
+
+    .admin-page-header {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+
+    .admin-filter select {
+        width: 100%;
+    }
+}
