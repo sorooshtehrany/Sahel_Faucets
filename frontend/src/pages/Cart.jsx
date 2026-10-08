@@ -59,6 +59,12 @@ function Cart() {
     const [pendingPayment, setPendingPayment] =
         useState(null);
 
+    const [deliveryAddress, setDeliveryAddress] =
+        useState("");
+
+    const [showAddressForm, setShowAddressForm] =
+        useState(false);
+
 
     /* =====================================================
        Load Cart
@@ -91,6 +97,11 @@ function Cart() {
 
             setPendingPayment(
                 pendingOrderData.payment
+            );
+
+
+            setDeliveryAddress(
+                pendingOrderData.order?.delivery_address || ""
             );
 
         }
@@ -375,11 +386,8 @@ function Cart() {
 
 
         /*
-         * اگر پرداخت سفارش شروع شده است،
-         * سفارش دیگر نباید دوباره ساخته یا
-         * به‌روزرسانی شود.
-         *
-         * فقط وارد صفحه پرداخت می‌شویم.
+         * اگر پرداخت قبلاً شروع شده،
+         * سفارش قفل است.
          */
 
         if (
@@ -395,6 +403,51 @@ function Cart() {
         }
 
 
+        /*
+         * هنوز پرداخت شروع نشده.
+         * ابتدا فرم آدرس را نمایش می‌دهیم.
+         */
+
+        setError("");
+
+        setShowAddressForm(true);
+
+    }
+
+    async function handleCreateOrder() {
+
+        if (
+            checkoutLoading ||
+            actionLoading
+        ) {
+            return;
+        }
+
+
+        const address =
+            deliveryAddress.trim();
+
+
+        if (!address) {
+
+            setError(
+                "لطفاً آدرس تحویل را وارد کنید."
+            );
+
+            return;
+        }
+
+
+        if (address.length > 1000) {
+
+            setError(
+                "آدرس تحویل نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد."
+            );
+
+            return;
+        }
+
+
         try {
 
             setCheckoutLoading(true);
@@ -402,18 +455,10 @@ function Cart() {
             setError("");
 
 
-            /*
-             * اگر سفارش نیمه‌کاره داریم ولی
-             * هنوز پرداخت شروع نشده است،
-             * createOrder آن سفارش را با
-             * سبد فعلی هماهنگ می‌کند.
-             *
-             * اگر سفارش وجود نداشته باشد،
-             * createOrder سفارش جدید می‌سازد.
-             */
-
             const data =
-                await createOrder();
+                await createOrder(
+                    address
+                );
 
 
             setPendingOrder(
@@ -424,6 +469,9 @@ function Cart() {
             setPendingPayment(
                 null
             );
+
+
+            setShowAddressForm(false);
 
 
             navigate(
@@ -454,7 +502,7 @@ function Cart() {
         catch (error) {
 
             console.error(
-                "Checkout error:",
+                "Create order error:",
                 error
             );
 
@@ -471,8 +519,6 @@ function Cart() {
 
         }
     }
-
-
     /* =====================================================
        Continue Payment
     ===================================================== */
@@ -489,9 +535,8 @@ function Cart() {
 
 
         /*
-         * اگر پرداخت قبلاً شروع شده است،
-         * سفارش قفل است و مستقیماً وارد
-         * صفحه پرداخت می‌شویم.
+         * اگر پرداخت قبلاً شروع شده،
+         * مستقیماً وارد صفحه پرداخت شو.
          */
 
         if (
@@ -507,59 +552,14 @@ function Cart() {
 
 
         /*
-         * اگر پرداخت هنوز شروع نشده،
-         * باید سفارش را با سبد فعلی
-         * هماهنگ کنیم.
-         *
-         * این قسمت جلوی نمایش مبلغ قدیمی
-         * سفارش را می‌گیرد.
+         * پرداخت هنوز شروع نشده.
+         * فرم آدرس را نمایش بده.
          */
 
-        try {
+        setError("");
 
-            setCheckoutLoading(true);
+        setShowAddressForm(true);
 
-            setError("");
-
-
-            const data =
-                await createOrder();
-
-
-            setPendingOrder(
-                data.order
-            );
-
-
-            setPendingPayment(
-                null
-            );
-
-
-            navigate(
-                `/payment/${data.order.id}`
-            );
-
-        }
-        catch (error) {
-
-            console.error(
-                "Continue payment error:",
-                error
-            );
-
-
-            setError(
-                error.message ||
-                "خطایی در به‌روزرسانی سفارش رخ داد."
-            );
-
-        }
-        finally {
-
-            setCheckoutLoading(false);
-
-        }
     }
 
 
@@ -902,6 +902,113 @@ function Cart() {
                     </div>
 
                 )}
+
+
+                {/* =================================================
+   Delivery Address
+================================================= */}
+
+                {showAddressForm && (
+
+                    <div className="cart-address-box">
+
+                        <div className="cart-address-header">
+
+                            <h2>
+                                آدرس تحویل سفارش
+                            </h2>
+
+                            <p>
+                                آدرس دقیق محل تحویل سفارش را وارد کنید.
+                            </p>
+
+                        </div>
+
+
+                        <textarea
+                            className="cart-address-input"
+                            value={deliveryAddress}
+                            onChange={(event) =>
+                                setDeliveryAddress(
+                                    event.target.value
+                                )
+                            }
+                            placeholder="مثلاً: تهران، خیابان ولیعصر، پلاک ۱۲۳"
+                            rows={4}
+                            maxLength={1000}
+                            disabled={
+                                checkoutLoading ||
+                                actionLoading
+                            }
+                        />
+
+
+                        <div className="cart-address-footer">
+
+                            <span className="cart-address-counter">
+
+                                {deliveryAddress.length.toLocaleString("fa-IR")}
+                                {" / "}
+                                ۱۰۰۰
+
+                            </span>
+
+
+                            <div className="cart-address-actions">
+
+                                <button
+                                    type="button"
+                                    className="cart-back-button"
+                                    onClick={() => {
+
+                                        setShowAddressForm(false);
+
+                                        setError("");
+
+                                    }}
+                                    disabled={
+                                        checkoutLoading ||
+                                        actionLoading
+                                    }
+                                >
+                                    انصراف
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    className="cart-checkout-button"
+                                    onClick={
+                                        handleCreateOrder
+                                    }
+                                    disabled={
+                                        checkoutLoading ||
+                                        actionLoading
+                                    }
+                                >
+
+                                    {
+                                        checkoutLoading
+
+                                            ? "در حال ثبت سفارش..."
+
+                                            : pendingOrder
+
+                                                ? "تأیید آدرس و ادامه پرداخت"
+
+                                                : "تأیید آدرس و ثبت سفارش"
+                                    }
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                )}
+
 
 
                 {/* =================================================

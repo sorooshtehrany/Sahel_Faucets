@@ -148,13 +148,18 @@ export async function clearCart() {
 
 
 // ایجاد سفارش از روی سبد خرید
-export async function createOrder() {
+export async function createOrder(
+    deliveryAddress
+) {
 
     const response = await fetch(
         `${API_BASE_URL}/orders`,
         {
             method: "POST",
-            headers: getAuthHeaders()
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                delivery_address: deliveryAddress
+            })
         }
     );
 
@@ -163,7 +168,8 @@ export async function createOrder() {
     if (!response.ok) {
 
         throw new Error(
-            data.message || "خطا در ایجاد سفارش"
+            data.message ||
+            "خطا در ایجاد سفارش"
         );
     }
 

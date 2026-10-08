@@ -979,6 +979,206 @@
 }
 
 
+
+/* =========================================================
+   Delivery Address
+========================================================= */
+
+.cart-address-box {
+
+    margin-top: 24px;
+
+    padding: 22px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255, 255, 255, 0.15);
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.25);
+
+    box-shadow:
+        0 7px 22px
+        rgba(0, 0, 0, 0.06);
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+}
+
+
+/* =========================================================
+   Address Header
+========================================================= */
+
+.cart-address-header {
+
+    margin-bottom: 14px;
+
+}
+
+
+.cart-address-header h2 {
+
+    margin:
+        0 0 5px;
+
+    color:
+        #3f4f9f;
+
+    font-size: 18px;
+
+    font-weight: 800;
+
+}
+
+
+.cart-address-header p {
+
+    margin: 0;
+
+    color:
+        #59646a;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+}
+
+
+/* =========================================================
+   Address Input
+========================================================= */
+
+.cart-address-input {
+
+    width: 100%;
+
+    min-height: 110px;
+
+    padding:
+        13px 15px;
+
+    box-sizing: border-box;
+
+    resize: vertical;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.30);
+
+    border-radius: 13px;
+
+    outline: none;
+
+    background:
+        rgba(255, 255, 255, 0.22);
+
+    color:
+        #43515a;
+
+    font-family:
+        inherit;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    line-height: 1.8;
+
+    direction: rtl;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.cart-address-input::placeholder {
+
+    color:
+        rgba(67, 81, 90, 0.60);
+
+}
+
+
+.cart-address-input:focus {
+
+    border-color:
+        rgba(63, 79, 159, 0.45);
+
+    background:
+        rgba(255, 255, 255, 0.30);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(63, 79, 159, 0.08);
+
+}
+
+
+.cart-address-input:disabled {
+
+    opacity: 0.60;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =========================================================
+   Address Footer
+========================================================= */
+
+.cart-address-footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 12px;
+
+}
+
+
+.cart-address-counter {
+
+    color:
+        #59646a;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   Address Actions
+========================================================= */
+
+.cart-address-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+
 /* =========================================================
    Empty Cart
 ========================================================= */
@@ -1668,6 +1868,66 @@
 
         font-size: 12px;
 
+    }
+
+
+    .cart-address-box {
+
+        padding: 17px;
+    
+        border-radius: 17px;
+    
+    }
+    
+    
+    .cart-address-header h2 {
+    
+        font-size: 16px;
+    
+    }
+    
+    
+    .cart-address-input {
+    
+        min-height: 120px;
+    
+        font-size: 13px;
+    
+    }
+    
+    
+    .cart-address-footer {
+    
+        flex-direction: column;
+    
+        align-items: stretch;
+    
+    }
+    
+    
+    .cart-address-counter {
+    
+        text-align: left;
+    
+    }
+    
+    
+    .cart-address-actions {
+    
+        flex-direction: column-reverse;
+    
+        gap: 8px;
+    
+    }
+    
+    
+    .cart-address-actions
+    .cart-back-button,
+    .cart-address-actions
+    .cart-checkout-button {
+    
+        width: 100%;
+    
     }
 
 }

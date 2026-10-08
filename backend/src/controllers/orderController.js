@@ -12,11 +12,42 @@ async function createOrder(req, res) {
 
     let transactionStarted = false;
 
-
     try {
 
         const customerId =
             req.customerId;
+
+
+        // -------------------------------------------------
+        // Get delivery address
+        // -------------------------------------------------
+
+        const deliveryAddress =
+            typeof req.body?.delivery_address === "string"
+                ? req.body.delivery_address.trim()
+                : "";
+
+
+        // -------------------------------------------------
+        // Validate delivery address
+        // -------------------------------------------------
+
+        if (!deliveryAddress) {
+
+            return res.status(400).json({
+                message:
+                    "آدرس تحویل الزامی است."
+            });
+        }
+
+
+        if (deliveryAddress.length > 1000) {
+
+            return res.status(400).json({
+                message:
+                    "آدرس تحویل بیش از حد طولانی است."
+            });
+        }
 
 
         // -------------------------------------------------
@@ -130,10 +161,8 @@ async function createOrder(req, res) {
             const stock =
                 Number(item.stock);
 
-
             const quantity =
                 Number(item.quantity);
-
 
             const price =
                 Number(item.price);
@@ -154,6 +183,8 @@ async function createOrder(req, res) {
                         `قیمت محصول «${item.name_fa}» معتبر نیست.`
                 });
             }
+
+
             // ---------------------------------------------
             // Product inactive
             // ---------------------------------------------
@@ -212,6 +243,7 @@ async function createOrder(req, res) {
             totalAmount += itemTotal;
         }
 
+
         if (totalAmount <= 0) {
 
             await client.query("ROLLBACK");
@@ -223,6 +255,8 @@ async function createOrder(req, res) {
                     "مبلغ سفارش باید بیشتر از صفر باشد."
             });
         }
+
+
         // -------------------------------------------------
         // Check existing pending order
         // -------------------------------------------------
@@ -236,6 +270,9 @@ async function createOrder(req, res) {
                     customer_id,
                     total_amount,
                     status,
+                    delivery_address,
+                    payment_status,
+                    delivery_status,
                     created_at
 
                 FROM orders
@@ -272,18 +309,18 @@ async function createOrder(req, res) {
             const pendingPaymentResult =
                 await client.query(
                     `
-    SELECT
-        id
+                    SELECT
+                        id
 
-    FROM payments
+                    FROM payments
 
-    WHERE order_id = $1
-      AND status = 'pending'
+                    WHERE order_id = $1
+                      AND status = 'pending'
 
-    LIMIT 1
+                    LIMIT 1
 
-    FOR UPDATE
-    `,
+                    FOR UPDATE
+                    `,
                     [existingOrder.id]
                 );
 
@@ -301,6 +338,8 @@ async function createOrder(req, res) {
                         "پرداخت این سفارش قبلاً آغاز شده است و امکان ویرایش آن وجود ندارد."
                 });
             }
+
+
             // ---------------------------------------------
             // Remove old order items
             // ---------------------------------------------
@@ -364,7 +403,7 @@ async function createOrder(req, res) {
 
 
             // ---------------------------------------------
-            // Update order total
+            // Update order
             // ---------------------------------------------
 
             const updatedOrderResult =
@@ -373,19 +412,24 @@ async function createOrder(req, res) {
                     UPDATE orders
 
                     SET
-                        total_amount = $1
+                        total_amount = $1,
+                        delivery_address = $2
 
-                    WHERE id = $2
+                    WHERE id = $3
 
                     RETURNING
                         id,
                         customer_id,
                         total_amount,
                         status,
+                        delivery_address,
+                        payment_status,
+                        delivery_status,
                         created_at
                     `,
                     [
                         totalAmount,
+                        deliveryAddress,
                         existingOrder.id
                     ]
                 );
@@ -403,6 +447,10 @@ async function createOrder(req, res) {
 
             transactionStarted = false;
 
+
+            // ---------------------------------------------
+            // Response
+            // ---------------------------------------------
 
             return res.status(200).json({
 
@@ -429,6 +477,15 @@ async function createOrder(req, res) {
                     status:
                         updatedOrder.status,
 
+                    delivery_address:
+                        updatedOrder.delivery_address,
+
+                    payment_status:
+                        updatedOrder.payment_status,
+
+                    delivery_status:
+                        updatedOrder.delivery_status,
+
                     created_at:
                         updatedOrder.created_at
                 }
@@ -447,12 +504,18 @@ async function createOrder(req, res) {
                 INSERT INTO orders (
                     customer_id,
                     total_amount,
-                    status
+                    status,
+                    delivery_address,
+                    payment_status,
+                    delivery_status
                 )
 
                 VALUES (
                     $1,
                     $2,
+                    'pending',
+                    $3,
+                    'pending',
                     'pending'
                 )
 
@@ -461,11 +524,15 @@ async function createOrder(req, res) {
                     customer_id,
                     total_amount,
                     status,
+                    delivery_address,
+                    payment_status,
+                    delivery_status,
                     created_at
                 `,
                 [
                     customerId,
-                    totalAmount
+                    totalAmount,
+                    deliveryAddress
                 ]
             );
 
@@ -560,6 +627,15 @@ async function createOrder(req, res) {
                 status:
                     order.status,
 
+                delivery_address:
+                    order.delivery_address,
+
+                payment_status:
+                    order.payment_status,
+
+                delivery_status:
+                    order.delivery_status,
+
                 created_at:
                     order.created_at
             }
@@ -596,6 +672,7 @@ async function createOrder(req, res) {
             message:
                 "خطایی در ایجاد یا به‌روزرسانی سفارش رخ داد."
         });
+
     }
     finally {
 
@@ -604,10 +681,6 @@ async function createOrder(req, res) {
     }
 }
 
-
-// =====================================================
-// Get Pending Order
-// =====================================================
 
 // =====================================================
 // Get Pending Order
@@ -633,11 +706,18 @@ async function getPendingOrder(req, res) {
                     customer_id,
                     total_amount,
                     status,
+                    delivery_address,
+                    payment_status,
+                    delivery_status,
                     created_at
+
                 FROM orders
+
                 WHERE customer_id = $1
                   AND status = 'pending'
+
                 ORDER BY id DESC
+
                 LIMIT 1
                 `,
                 [customerId]
@@ -684,10 +764,14 @@ async function getPendingOrder(req, res) {
                     reference_id,
                     created_at,
                     paid_at
+
                 FROM payments
+
                 WHERE order_id = $1
                   AND status = 'pending'
+
                 ORDER BY id DESC
+
                 LIMIT 1
                 `,
                 [
@@ -765,6 +849,15 @@ async function getPendingOrder(req, res) {
                 status:
                     order.status,
 
+                delivery_address:
+                    order.delivery_address,
+
+                payment_status:
+                    order.payment_status,
+
+                delivery_status:
+                    order.delivery_status,
+
                 created_at:
                     order.created_at
 
@@ -794,6 +887,10 @@ async function getPendingOrder(req, res) {
 }
 
 
+// =====================================================
+// Cancel Pending Order
+// =====================================================
+
 async function cancelPendingOrder(req, res) {
 
     const client =
@@ -807,46 +904,56 @@ async function cancelPendingOrder(req, res) {
             req.customerId;
 
 
-        // ---------------------------------------------
+        // -------------------------------------------------
         // BEGIN TRANSACTION
-        // ---------------------------------------------
+        // -------------------------------------------------
 
         await client.query("BEGIN");
 
         transactionStarted = true;
 
 
-        // ---------------------------------------------
-        // Get pending order
-        // ---------------------------------------------
+        // -------------------------------------------------
+        // Get and lock pending order
+        // -------------------------------------------------
 
         const orderResult =
             await client.query(
                 `
                 SELECT
                     id,
-                    status
+                    customer_id,
+                    total_amount,
+                    status,
+                    delivery_address,
+                    payment_status,
+                    delivery_status,
+                    created_at,
+                    paid_at
+
                 FROM orders
+
                 WHERE customer_id = $1
                   AND status = 'pending'
-                ORDER BY id DESC
-                LIMIT 1
+
                 FOR UPDATE
                 `,
-                [customerId]
+                [
+                    customerId
+                ]
             );
 
 
         if (orderResult.rows.length === 0) {
 
             await client.query("ROLLBACK");
-
             transactionStarted = false;
 
             return res.status(404).json({
                 message:
-                    "سفارش نیمه‌کاره‌ای برای لغو وجود ندارد."
+                    "سفارش در انتظار پیدا نشد."
             });
+
         }
 
 
@@ -854,114 +961,158 @@ async function cancelPendingOrder(req, res) {
             orderResult.rows[0];
 
 
-        // ---------------------------------------------
+        // -------------------------------------------------
+        // Validate payment status
+        // -------------------------------------------------
+
+        if (order.payment_status !== "pending") {
+
+            await client.query("ROLLBACK");
+            transactionStarted = false;
+
+            return res.status(409).json({
+                message:
+                    "وضعیت پرداخت این سفارش اجازه لغو آن را نمی‌دهد."
+            });
+
+        }
+
+
+        // -------------------------------------------------
         // Cancel pending payments
-        // ---------------------------------------------
+        // -------------------------------------------------
 
-        await client.query(
-            `
-            UPDATE payments
-            SET
-                status = 'cancelled'
-            WHERE order_id = $1
-              AND status = 'pending'
-            `,
-            [order.id]
-        );
+        const paymentResult =
+            await client.query(
+                `
+                UPDATE payments
+
+                SET
+                    status = 'cancelled'
+
+                WHERE order_id = $1
+                  AND status = 'pending'
+
+                RETURNING
+                    id,
+                    order_id,
+                    amount,
+                    status,
+                    gateway,
+                    authority,
+                    reference_id,
+                    created_at,
+                    paid_at
+                `,
+                [
+                    order.id
+                ]
+            );
 
 
-        // ---------------------------------------------
+        // -------------------------------------------------
         // Cancel order
-        // ---------------------------------------------
+        // -------------------------------------------------
 
-        const updateResult =
+        const updateOrderResult =
             await client.query(
                 `
                 UPDATE orders
+
                 SET
-                    status = 'cancelled'
+                    status = 'cancelled',
+                    delivery_status = 'cancelled'
+
                 WHERE id = $1
+                  AND customer_id = $2
                   AND status = 'pending'
+                  AND payment_status = 'pending'
+
                 RETURNING
                     id,
                     customer_id,
                     total_amount,
                     status,
-                    created_at
+                    delivery_address,
+                    payment_status,
+                    delivery_status,
+                    created_at,
+                    paid_at
                 `,
-                [order.id]
+                [
+                    order.id,
+                    customerId
+                ]
             );
 
 
-        if (updateResult.rows.length === 0) {
+        if (updateOrderResult.rows.length === 0) {
 
             await client.query("ROLLBACK");
-
             transactionStarted = false;
 
             return res.status(409).json({
                 message:
-                    "وضعیت سفارش تغییر کرده است. دوباره تلاش کنید."
+                    "وضعیت سفارش دیگر قابل لغو نیست."
             });
+
         }
 
 
-        // ---------------------------------------------
+        const updatedOrder =
+            updateOrderResult.rows[0];
+
+
+        // -------------------------------------------------
         // COMMIT
-        // ---------------------------------------------
+        // -------------------------------------------------
 
         await client.query("COMMIT");
 
         transactionStarted = false;
 
 
-        const cancelledOrder =
-            updateResult.rows[0];
-
+        // -------------------------------------------------
+        // Response
+        // -------------------------------------------------
 
         return res.status(200).json({
-            message:
-                "سفارش نیمه‌کاره با موفقیت لغو شد.",
 
-            order: {
-                id: cancelledOrder.id,
-                customer_id:
-                    cancelledOrder.customer_id,
-                total_amount:
-                    Number(
-                        cancelledOrder.total_amount
-                    ),
-                status:
-                    cancelledOrder.status,
-                created_at:
-                    cancelledOrder.created_at
-            }
+            message:
+                "سفارش با موفقیت لغو شد.",
+
+            order:
+                updatedOrder,
+
+            payments:
+                paymentResult.rows
         });
 
-    }
-    catch (error) {
 
-        console.error(
-            "Cancel pending order error:",
-            error
-        );
-
+    } catch (error) {
 
         if (transactionStarted) {
+
             await client.query("ROLLBACK");
         }
 
+        console.error(
+            "cancelPendingOrder error:",
+            error
+        );
 
         return res.status(500).json({
             message:
-                "خطایی در لغو سفارش رخ داد."
+                "خطا در لغو سفارش."
         });
-    }
-    finally {
+
+    } finally {
 
         client.release();
     }
 }
+
+
 // =====================================================
 // Start Payment
 // =====================================================
@@ -1023,9 +1174,12 @@ async function startPayment(req, res) {
                     total_amount,
                     status,
                     created_at
+
                 FROM orders
+
                 WHERE id = $1
                   AND customer_id = $2
+
                 FOR UPDATE
                 `,
                 [
@@ -1090,10 +1244,14 @@ async function startPayment(req, res) {
                     status,
                     gateway,
                     created_at
+
                 FROM payments
+
                 WHERE order_id = $1
                   AND status = 'pending'
+
                 LIMIT 1
+
                 FOR UPDATE
                 `,
                 [orderId]
@@ -1134,12 +1292,14 @@ async function startPayment(req, res) {
                     status,
                     gateway
                 )
+
                 VALUES (
                     $1,
                     $2,
                     'pending',
                     'test'
                 )
+
                 RETURNING
                     id,
                     order_id,
@@ -1248,6 +1408,14 @@ async function startPayment(req, res) {
 }
 
 
+// =====================================================
+// Test Payment Success
+// =====================================================
+
+// =====================================================
+// Test Payment Success
+// =====================================================
+
 async function testPaymentSuccess(req, res) {
 
     const client =
@@ -1268,7 +1436,10 @@ async function testPaymentSuccess(req, res) {
         // Validate order id
         // -------------------------------------------------
 
-        if (!Number.isInteger(orderId) || orderId <= 0) {
+        if (
+            !Number.isInteger(orderId) ||
+            orderId <= 0
+        ) {
 
             return res.status(400).json({
                 message:
@@ -1298,6 +1469,9 @@ async function testPaymentSuccess(req, res) {
                     customer_id,
                     total_amount,
                     status,
+                    payment_status,
+                    delivery_status,
+                    created_at,
                     paid_at
 
                 FROM orders
@@ -1344,6 +1518,25 @@ async function testPaymentSuccess(req, res) {
             return res.status(400).json({
                 message:
                     "این سفارش دیگر در وضعیت قابل پرداخت نیست."
+            });
+        }
+
+
+        // -------------------------------------------------
+        // Payment status must be pending
+        // -------------------------------------------------
+
+        if (
+            order.payment_status !== "pending"
+        ) {
+
+            await client.query("ROLLBACK");
+
+            transactionStarted = false;
+
+            return res.status(400).json({
+                message:
+                    "وضعیت پرداخت این سفارش قابل تکمیل نیست."
             });
         }
 
@@ -1555,15 +1748,22 @@ async function testPaymentSuccess(req, res) {
 
                 SET
                     status = 'paid',
+                    payment_status = 'paid',
+                    delivery_status = 'pending',
                     paid_at = $1
 
                 WHERE id = $2
+                  AND status = 'pending'
+                  AND payment_status = 'pending'
 
                 RETURNING
                     id,
                     customer_id,
                     total_amount,
                     status,
+                    delivery_address,
+                    payment_status,
+                    delivery_status,
                     created_at,
                     paid_at
                 `,
@@ -1572,6 +1772,25 @@ async function testPaymentSuccess(req, res) {
                     orderId
                 ]
             );
+
+
+        // -------------------------------------------------
+        // Safety check
+        // -------------------------------------------------
+
+        if (
+            updatedOrderResult.rows.length === 0
+        ) {
+
+            await client.query("ROLLBACK");
+
+            transactionStarted = false;
+
+            return res.status(409).json({
+                message:
+                    "وضعیت سفارش هنگام تکمیل پرداخت تغییر کرده است."
+            });
+        }
 
 
         // -------------------------------------------------
@@ -1617,6 +1836,7 @@ async function testPaymentSuccess(req, res) {
 
             payment:
                 updatedPaymentResult.rows[0]
+
         });
 
 
@@ -1631,9 +1851,21 @@ async function testPaymentSuccess(req, res) {
 
         if (transactionStarted) {
 
-            await client.query(
-                "ROLLBACK"
-            );
+            try {
+
+                await client.query(
+                    "ROLLBACK"
+                );
+
+            }
+            catch (rollbackError) {
+
+                console.error(
+                    "Rollback error:",
+                    rollbackError
+                );
+
+            }
         }
 
 
@@ -1646,9 +1878,14 @@ async function testPaymentSuccess(req, res) {
     finally {
 
         client.release();
+
     }
 }
 
+
+// =====================================================
+// Test Payment Failed
+// =====================================================
 
 async function testPaymentFailed(req, res) {
 
@@ -1663,22 +1900,19 @@ async function testPaymentFailed(req, res) {
             req.customerId;
 
         const orderId =
-            Number(req.params.orderId);
+            parseInt(req.params.orderId, 10);
 
 
         // -------------------------------------------------
-        // Validate order id
+        // Validate orderId
         // -------------------------------------------------
 
-        if (
-            !Number.isInteger(orderId) ||
-            orderId <= 0
-        ) {
+        if (!Number.isInteger(orderId)) {
 
             return res.status(400).json({
-                message:
-                    "شناسه سفارش نامعتبر است."
+                message: "شناسه سفارش نامعتبر است."
             });
+
         }
 
 
@@ -1703,11 +1937,17 @@ async function testPaymentFailed(req, res) {
                     customer_id,
                     total_amount,
                     status,
+                    delivery_address,
+                    payment_status,
+                    delivery_status,
                     created_at,
                     paid_at
+
                 FROM orders
+
                 WHERE id = $1
                   AND customer_id = $2
+
                 FOR UPDATE
                 `,
                 [
@@ -1720,13 +1960,12 @@ async function testPaymentFailed(req, res) {
         if (orderResult.rows.length === 0) {
 
             await client.query("ROLLBACK");
-
             transactionStarted = false;
 
             return res.status(404).json({
-                message:
-                    "سفارش پیدا نشد."
+                message: "سفارش پیدا نشد."
             });
+
         }
 
 
@@ -1735,19 +1974,36 @@ async function testPaymentFailed(req, res) {
 
 
         // -------------------------------------------------
-        // Order must be pending
+        // Validate order status
         // -------------------------------------------------
 
         if (order.status !== "pending") {
 
             await client.query("ROLLBACK");
-
             transactionStarted = false;
 
-            return res.status(400).json({
+            return res.status(409).json({
                 message:
                     "این سفارش دیگر در وضعیت قابل پرداخت نیست."
             });
+
+        }
+
+
+        // -------------------------------------------------
+        // Validate payment status
+        // -------------------------------------------------
+
+        if (order.payment_status !== "pending") {
+
+            await client.query("ROLLBACK");
+            transactionStarted = false;
+
+            return res.status(409).json({
+                message:
+                    "وضعیت پرداخت این سفارش قبلاً تعیین شده است."
+            });
+
         }
 
 
@@ -1768,11 +2024,16 @@ async function testPaymentFailed(req, res) {
                     reference_id,
                     created_at,
                     paid_at
+
                 FROM payments
+
                 WHERE order_id = $1
                   AND status = 'pending'
+
                 ORDER BY id DESC
+
                 LIMIT 1
+
                 FOR UPDATE
                 `,
                 [
@@ -1784,13 +2045,13 @@ async function testPaymentFailed(req, res) {
         if (paymentResult.rows.length === 0) {
 
             await client.query("ROLLBACK");
-
             transactionStarted = false;
 
-            return res.status(400).json({
+            return res.status(404).json({
                 message:
-                    "برای این سفارش پرداخت در حال انجامی وجود ندارد."
+                    "پرداخت در انتظار برای این سفارش پیدا نشد."
             });
+
         }
 
 
@@ -1808,13 +2069,13 @@ async function testPaymentFailed(req, res) {
         ) {
 
             await client.query("ROLLBACK");
-
             transactionStarted = false;
 
-            return res.status(400).json({
+            return res.status(409).json({
                 message:
                     "مبلغ پرداخت با مبلغ سفارش مطابقت ندارد."
             });
+
         }
 
 
@@ -1822,13 +2083,22 @@ async function testPaymentFailed(req, res) {
         // Mark payment as failed
         // -------------------------------------------------
 
-        const updatedPaymentResult =
+        const failedAt =
+            new Date();
+
+
+        const updatePaymentResult =
             await client.query(
                 `
                 UPDATE payments
+
                 SET
                     status = 'failed'
+
                 WHERE id = $1
+                  AND order_id = $2
+                  AND status = 'pending'
+
                 RETURNING
                     id,
                     order_id,
@@ -1841,41 +2111,77 @@ async function testPaymentFailed(req, res) {
                     paid_at
                 `,
                 [
-                    payment.id
-                ]
-            );
-
-
-        // -------------------------------------------------
-        // Mark order as failed
-        // -------------------------------------------------
-
-        const updatedOrderResult =
-            await client.query(
-                `
-                UPDATE orders
-                SET
-                    status = 'failed'
-                WHERE id = $1
-                RETURNING
-                    id,
-                    customer_id,
-                    total_amount,
-                    status,
-                    created_at,
-                    paid_at
-                `,
-                [
+                    payment.id,
                     orderId
                 ]
             );
 
 
+        if (updatePaymentResult.rows.length === 0) {
+
+            await client.query("ROLLBACK");
+            transactionStarted = false;
+
+            return res.status(409).json({
+                message:
+                    "پرداخت دیگر در وضعیت قابل تغییر نیست."
+            });
+
+        }
+
+
         // -------------------------------------------------
-        // IMPORTANT:
-        // No stock update
-        // No cart deletion
+        // Update order
         // -------------------------------------------------
+
+        const updateOrderResult =
+            await client.query(
+                `
+                UPDATE orders
+
+                SET
+                    status = 'failed',
+                    payment_status = 'failed',
+                    delivery_status = 'cancelled'
+
+                WHERE id = $1
+                  AND customer_id = $2
+                  AND status = 'pending'
+                  AND payment_status = 'pending'
+
+                RETURNING
+                    id,
+                    customer_id,
+                    total_amount,
+                    status,
+                    delivery_address,
+                    payment_status,
+                    delivery_status,
+                    created_at,
+                    paid_at
+                `,
+                [
+                    orderId,
+                    customerId
+                ]
+            );
+
+
+        if (updateOrderResult.rows.length === 0) {
+
+            await client.query("ROLLBACK");
+            transactionStarted = false;
+
+            return res.status(409).json({
+                message:
+                    "وضعیت سفارش دیگر قابل تغییر نیست."
+            });
+
+        }
+
+
+        const updatedOrder =
+            updateOrderResult.rows[0];
 
 
         // -------------------------------------------------
@@ -1887,43 +2193,41 @@ async function testPaymentFailed(req, res) {
         transactionStarted = false;
 
 
+        // -------------------------------------------------
+        // Response
+        // -------------------------------------------------
+
         return res.status(200).json({
 
             message:
-                "پرداخت آزمایشی ناموفق بود.",
+                "پرداخت آزمایشی ناموفق ثبت شد.",
 
             order:
-                updatedOrderResult.rows[0],
+                updatedOrder,
 
             payment:
-                updatedPaymentResult.rows[0]
-
+                updatePaymentResult.rows[0]
         });
 
-    }
-    catch (error) {
+
+    } catch (error) {
+
+        if (transactionStarted) {
+
+            await client.query("ROLLBACK");
+        }
 
         console.error(
             "testPaymentFailed error:",
             error
         );
 
-
-        if (transactionStarted) {
-
-            await client.query(
-                "ROLLBACK"
-            );
-        }
-
-
         return res.status(500).json({
             message:
-                "خطایی در ثبت پرداخت ناموفق رخ داد."
+                "خطا در ثبت پرداخت ناموفق."
         });
 
-    }
-    finally {
+    } finally {
 
         client.release();
     }
@@ -1942,4 +2246,3 @@ module.exports = {
     testPaymentSuccess,
     testPaymentFailed
 };
-

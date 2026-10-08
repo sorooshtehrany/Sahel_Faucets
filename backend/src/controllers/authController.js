@@ -47,73 +47,304 @@ async function register(req, res) {
         if (password.length < 6) {
 
             return res.status(400).json({
-                message: "رمز عبور باید حداقل ۶ کاراکتر باشد."
+                message:
+                    "رمز عبور باید حداقل ۶ کاراکتر باشد."
             });
 
         }
+
 
 
         // -------------------------
         // Check existing customer
         // -------------------------
 
-        const existingCustomer = await pool.query(
-            `
-            SELECT id
-            FROM customers
-            WHERE phone = $1
-            `,
-            [phone]
-        );
+        const existingCustomer =
+            await pool.query(
+                `
+        SELECT
+            id,
+            first_name,
+            last_name,
+            phone,
+            phone_verified
+        FROM customers
+        WHERE phone = $1
+        `,
+                [phone]
+            );
 
 
         if (existingCustomer.rows.length > 0) {
 
-            return res.status(409).json({
-                message: "این شماره موبایل قبلاً ثبت شده است."
+            const customer =
+                existingCustomer.rows[0];
+
+
+            // -------------------------
+            // Already verified
+            // -------------------------
+
+            if (customer.phone_verified) {
+
+                return res.status(409).json({
+                    message:
+                        "این شماره موبایل قبلاً ثبت شده است."
+                });
+
+            }
+
+
+            // -------------------------
+            // Existing but not verified
+            // -------------------------
+            // Generate a new registration OTP
+
+            const code =
+                Math.floor(
+                    100000 +
+                    Math.random() * 900000
+                ).toString();
+
+
+            const expiresAt =
+                new Date(
+                    Date.now() + 5 * 60 * 1000
+                );
+
+
+            // -------------------------
+            // Invalidate previous
+            // registration codes
+            // -------------------------
+
+            await pool.query(
+                `
+        UPDATE password_reset_codes
+        SET used = TRUE
+        WHERE customer_id = $1
+          AND purpose = 'registration'
+          AND used = FALSE
+        `,
+                [customer.id]
+            );
+
+
+            // -------------------------
+            // Save new registration OTP
+            // -------------------------
+
+            await pool.query(
+                `
+        INSERT INTO password_reset_codes
+        (
+            customer_id,
+            code,
+            expires_at,
+            purpose
+        )
+        VALUES ($1, $2, $3, 'registration')
+        `,
+                [
+                    customer.id,
+                    code,
+                    expiresAt
+                ]
+            );
+
+
+            // -------------------------
+            // Development only
+            // -------------------------
+
+            console.log(
+                "================================="
+            );
+
+            console.log(
+                "REGISTRATION OTP - EXISTING UNVERIFIED USER"
+            );
+
+            console.log(
+                `Phone: ${customer.phone}`
+            );
+
+            console.log(
+                `OTP: ${code}`
+            );
+
+            console.log(
+                `Expires: ${expiresAt.toLocaleString()}`
+            );
+
+            console.log(
+                "================================="
+            );
+
+
+            // -------------------------
+            // Response
+            // -------------------------
+
+            return res.status(200).json({
+
+                message:
+                    "کد تأیید جدید به شماره موبایل شما ارسال شد.",
+
+                customer: {
+                    id: customer.id,
+                    first_name: customer.first_name,
+                    last_name: customer.last_name,
+                    phone: customer.phone,
+                    phone_verified: false
+                }
+
             });
 
         }
+
+
 
 
         // -------------------------
         // Hash password
         // -------------------------
 
-        const passwordHash = await bcrypt.hash(
-            password,
-            10
+        const passwordHash =
+            await bcrypt.hash(
+                password,
+                10
+            );
+
+
+        // -------------------------
+        // Create customer
+        // -------------------------
+
+        const result =
+            await pool.query(
+                `
+                INSERT INTO customers
+                (
+                    first_name,
+                    last_name,
+                    phone,
+                    password_hash,
+                    phone_verified
+                )
+                VALUES ($1, $2, $3, $4, FALSE)
+                RETURNING
+                    id,
+                    first_name,
+                    last_name,
+                    phone,
+                    phone_verified,
+                    created_at
+                `,
+                [
+                    first_name,
+                    last_name,
+                    phone,
+                    passwordHash
+                ]
+            );
+
+
+        const customer =
+            result.rows[0];
+
+
+        const customerId =
+            customer.id;
+
+
+        // -------------------------
+        // Generate 6 digit OTP
+        // -------------------------
+
+        const code =
+            Math.floor(
+                100000 +
+                Math.random() * 900000
+            ).toString();
+
+
+        // -------------------------
+        // OTP expiration
+        // -------------------------
+
+        const expiresAt =
+            new Date(
+                Date.now() + 5 * 60 * 1000
+            );
+
+
+        // -------------------------
+        // Invalidate previous
+        // registration codes
+        // -------------------------
+
+        await pool.query(
+            `
+            UPDATE password_reset_codes
+            SET used = TRUE
+            WHERE customer_id = $1
+              AND purpose = 'registration'
+              AND used = FALSE
+            `,
+            [customerId]
         );
 
 
         // -------------------------
-        // Insert customer
+        // Save registration OTP
         // -------------------------
 
-        const result = await pool.query(
+        await pool.query(
             `
-            INSERT INTO customers
+            INSERT INTO password_reset_codes
             (
-                first_name,
-                last_name,
-                phone,
-                password_hash
+                customer_id,
+                code,
+                expires_at,
+                purpose
             )
-            VALUES ($1, $2, $3, $4)
-            RETURNING
-                id,
-                first_name,
-                last_name,
-                phone,
-                phone_verified,
-                created_at
+            VALUES ($1, $2, $3, 'registration')
             `,
             [
-                first_name,
-                last_name,
-                phone,
-                passwordHash
+                customerId,
+                code,
+                expiresAt
             ]
+        );
+
+
+        // -------------------------
+        // Development only
+        // -------------------------
+
+        console.log(
+            "================================="
+        );
+
+        console.log(
+            "REGISTRATION OTP"
+        );
+
+        console.log(
+            `Phone: ${phone}`
+        );
+
+        console.log(
+            `OTP: ${code}`
+        );
+
+        console.log(
+            `Expires: ${expiresAt.toLocaleString()}`
+        );
+
+        console.log(
+            "================================="
         );
 
 
@@ -123,9 +354,16 @@ async function register(req, res) {
 
         return res.status(201).json({
 
-            message: "ثبت‌نام با موفقیت انجام شد.",
+            message:
+                "کد تأیید به شماره موبایل شما ارسال شد.",
 
-            customer: result.rows[0]
+            customer: {
+                id: customer.id,
+                first_name: customer.first_name,
+                last_name: customer.last_name,
+                phone: customer.phone,
+                phone_verified: customer.phone_verified
+            }
 
         });
 
@@ -139,13 +377,212 @@ async function register(req, res) {
         );
 
         return res.status(500).json({
-            message: "خطایی در ثبت‌نام رخ داد."
+            message:
+                "خطایی در ثبت‌نام رخ داد."
         });
 
     }
 }
 
+// =====================================================
+// Verify Registration Code
+// =====================================================
 
+async function verifyRegistrationCode(req, res) {
+
+    try {
+
+        const {
+            phone,
+            code
+        } = req.body;
+
+
+        // -------------------------
+        // Validate input
+        // -------------------------
+
+        if (!phone || !code) {
+
+            return res.status(400).json({
+                message:
+                    "شماره موبایل و کد تأیید الزامی هستند."
+            });
+
+        }
+
+
+        // -------------------------
+        // Find customer
+        // -------------------------
+
+        const customerResult =
+            await pool.query(
+                `
+                SELECT
+                    id,
+                    first_name,
+                    last_name,
+                    phone,
+                    phone_verified,
+                    role
+                FROM customers
+                WHERE phone = $1
+                `,
+                [phone]
+            );
+
+
+        if (customerResult.rows.length === 0) {
+
+            return res.status(400).json({
+                message:
+                    "اطلاعات ثبت‌نام نامعتبر است."
+            });
+
+        }
+
+
+        const customer =
+            customerResult.rows[0];
+
+
+        // -------------------------
+        // Already verified
+        // -------------------------
+
+        if (customer.phone_verified) {
+
+            return res.status(400).json({
+                message:
+                    "این شماره موبایل قبلاً تأیید شده است."
+            });
+
+        }
+
+
+        // -------------------------
+        // Find valid registration OTP
+        // -------------------------
+
+        const codeResult =
+            await pool.query(
+                `
+                SELECT
+                    id,
+                    code,
+                    expires_at,
+                    used
+                FROM password_reset_codes
+                WHERE customer_id = $1
+                  AND code = $2
+                  AND purpose = 'registration'
+                  AND used = FALSE
+                ORDER BY created_at DESC
+                LIMIT 1
+                `,
+                [
+                    customer.id,
+                    code
+                ]
+            );
+
+
+        if (codeResult.rows.length === 0) {
+
+            return res.status(400).json({
+                message:
+                    "کد تأیید نادرست یا استفاده‌شده است."
+            });
+
+        }
+
+
+        const registrationCode =
+            codeResult.rows[0];
+
+
+        // -------------------------
+        // Check expiration
+        // -------------------------
+
+        if (
+            new Date(registrationCode.expires_at)
+            <= new Date()
+        ) {
+
+            return res.status(400).json({
+                message:
+                    "کد تأیید منقضی شده است."
+            });
+
+        }
+
+
+        // -------------------------
+        // Verify phone
+        // -------------------------
+
+        await pool.query(
+            `
+            UPDATE customers
+            SET phone_verified = TRUE
+            WHERE id = $1
+            `,
+            [customer.id]
+        );
+
+
+        // -------------------------
+        // Mark OTP as used
+        // -------------------------
+
+        await pool.query(
+            `
+            UPDATE password_reset_codes
+            SET used = TRUE
+            WHERE id = $1
+            `,
+            [registrationCode.id]
+        );
+
+
+        // -------------------------
+        // Success
+        // -------------------------
+
+        return res.status(200).json({
+
+            message:
+                "شماره موبایل با موفقیت تأیید شد.",
+
+            customer: {
+                id: customer.id,
+                first_name: customer.first_name,
+                last_name: customer.last_name,
+                phone: customer.phone,
+                phone_verified: true,
+                role: customer.role
+            }
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Verify registration code error:",
+            error
+        );
+
+        return res.status(500).json({
+            message:
+                "خطایی در تأیید شماره موبایل رخ داد."
+        });
+
+    }
+}
 
 // =====================================================
 // Login
@@ -186,7 +623,8 @@ async function login(req, res) {
                 last_name,
                 phone,
                 password_hash,
-                phone_verified
+                phone_verified,
+                role
             FROM customers
             WHERE phone = $1
             `,
@@ -230,6 +668,21 @@ async function login(req, res) {
 
 
         // -------------------------
+        // Check phone verification
+        // -------------------------
+
+        if (!customer.phone_verified) {
+
+            return res.status(403).json({
+                message:
+                    "شماره موبایل شما هنوز تأیید نشده است."
+            });
+
+        }
+
+
+
+        // -------------------------
         // Create JWT
         // -------------------------
 
@@ -264,7 +717,8 @@ async function login(req, res) {
                 first_name: customer.first_name,
                 last_name: customer.last_name,
                 phone: customer.phone,
-                phone_verified: customer.phone_verified
+                phone_verified: customer.phone_verified,
+                role: customer.role
             }
 
         });
@@ -297,7 +751,8 @@ async function getMe(req, res) {
                 last_name,
                 phone,
                 phone_verified,
-                created_at
+                created_at,
+                role
             FROM customers
             WHERE id = $1
             `,
@@ -425,7 +880,8 @@ async function forgotPassword(req, res) {
             UPDATE password_reset_codes
             SET used = TRUE
             WHERE customer_id = $1
-              AND used = FALSE
+            AND purpose = 'password_reset'
+            AND used = FALSE
             `,
             [customerId]
         );
@@ -441,9 +897,10 @@ async function forgotPassword(req, res) {
             (
                 customer_id,
                 code,
-                expires_at
+                expires_at,
+                purpose
             )
-            VALUES ($1, $2, $3)
+            VALUES ($1, $2, $3, 'password_reset')
             `,
             [
                 customerId,
@@ -581,8 +1038,9 @@ async function verifyResetCode(req, res) {
                 used
             FROM password_reset_codes
             WHERE customer_id = $1
-              AND code = $2
-              AND used = FALSE
+                AND code = $2
+                AND purpose = 'password_reset'
+                AND used = FALSE
             ORDER BY created_at DESC
             LIMIT 1
             `,
@@ -742,6 +1200,7 @@ async function resetPassword(req, res) {
             FROM password_reset_codes
             WHERE customer_id = $1
               AND code = $2
+              AND purpose = 'password_reset'
               AND used = FALSE
             ORDER BY created_at DESC
             LIMIT 1
@@ -859,6 +1318,7 @@ async function resetPassword(req, res) {
 
 module.exports = {
     register,
+    verifyRegistrationCode,
     login,
     getMe,
     forgotPassword,
