@@ -282,8 +282,8 @@ function Navbar() {
                                 <Link
                                     to="/cart"
                                     className={`navbar-cart ${cartItemCount > 0
-                                            ? "has-items"
-                                            : "is-empty"
+                                        ? "has-items"
+                                        : "is-empty"
                                         }`}
                                     aria-label="سبد خرید"
                                     title="سبد خرید"
@@ -469,7 +469,11 @@ function Navbar() {
                                 محصولات
                             </Link>
 
-                            <Link to="#">کاتالوگ</Link>
+                            {isAuthenticated && (
+                                <Link to="/cart" onClick={closeMenu}>
+                                    سبد خرید
+                                </Link>
+                            )}
 
                             <Link to="/about" onClick={closeMenu}>
                                 درباره ما

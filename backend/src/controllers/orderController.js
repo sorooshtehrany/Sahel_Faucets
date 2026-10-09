@@ -2232,8 +2232,562 @@ async function testPaymentFailed(req, res) {
         client.release();
     }
 }
+// =====================================================
+// Customer Order History
+// =====================================================
+
+async function getMyOrders(req, res) {
+
+    try {
+
+        const customerId = req.customerId;
+
+        if (!customerId) {
+
+            return res.status(401).json({
+                message: "احراز هویت مشتری انجام نشده است."
+            });
+
+        }
 
 
+        // -------------------------------------------------
+        // Pagination
+        // -------------------------------------------------
+
+        const page = Math.max(
+            parseInt(req.query.page, 10) || 1,
+            1
+        );
+
+        const limit = Math.min(
+            Math.max(
+                parseInt(req.query.limit, 10) || 20,
+                1
+            ),
+            100
+        );
+
+        const offset = (page - 1) * limit;
+
+
+        // -------------------------------------------------
+        // Filters
+        // -------------------------------------------------
+
+        const {
+            status,
+            paymentStatus,
+            deliveryStatus,
+            search,
+            dateFrom,
+            dateTo,
+            sortBy,
+            sortOrder
+        } = req.query;
+
+
+        const conditions = [
+            "o.customer_id = $1"
+        ];
+
+        const values = [
+            customerId
+        ];
+
+        let parameterIndex = 2;
+
+
+        // -------------------------------------------------
+        // Order status
+        // -------------------------------------------------
+
+        if (status) {
+
+            const allowedStatuses = [
+                "pending",
+                "paid",
+                "failed",
+                "cancelled"
+            ];
+
+            if (!allowedStatuses.includes(status)) {
+
+                return res.status(400).json({
+                    message: "وضعیت سفارش نامعتبر است."
+                });
+
+            }
+
+            conditions.push(
+                `o.status = $${parameterIndex}`
+            );
+
+            values.push(status);
+
+            parameterIndex++;
+
+        }
+
+
+        // -------------------------------------------------
+        // Payment status
+        // -------------------------------------------------
+
+        if (paymentStatus) {
+
+            const allowedPaymentStatuses = [
+                "pending",
+                "paid",
+                "failed"
+            ];
+
+            if (
+                !allowedPaymentStatuses.includes(
+                    paymentStatus
+                )
+            ) {
+
+                return res.status(400).json({
+                    message: "وضعیت پرداخت نامعتبر است."
+                });
+
+            }
+
+            conditions.push(
+                `o.payment_status = $${parameterIndex}`
+            );
+
+            values.push(paymentStatus);
+
+            parameterIndex++;
+
+        }
+
+
+        // -------------------------------------------------
+        // Delivery status
+        // -------------------------------------------------
+
+        if (deliveryStatus) {
+
+            const allowedDeliveryStatuses = [
+                "pending",
+                "preparing",
+                "shipped",
+                "delivered",
+                "cancelled"
+            ];
+
+            if (
+                !allowedDeliveryStatuses.includes(
+                    deliveryStatus
+                )
+            ) {
+
+                return res.status(400).json({
+                    message: "وضعیت ارسال نامعتبر است."
+                });
+
+            }
+
+            conditions.push(
+                `o.delivery_status = $${parameterIndex}`
+            );
+
+            values.push(deliveryStatus);
+
+            parameterIndex++;
+
+        }
+
+
+        // -------------------------------------------------
+        // Search by order ID
+        // -------------------------------------------------
+
+        if (search && search.trim()) {
+
+            const searchValue = search.trim();
+
+            if (!/^\d+$/.test(searchValue)) {
+
+                return res.status(400).json({
+                    message: "شماره سفارش نامعتبر است."
+                });
+
+            }
+
+            conditions.push(
+                `CAST(o.id AS TEXT) = $${parameterIndex}`
+            );
+
+            values.push(searchValue);
+
+            parameterIndex++;
+
+        }
+
+
+        // -------------------------------------------------
+        // Date From
+        // -------------------------------------------------
+
+        if (dateFrom) {
+
+            const fromDate = new Date(dateFrom);
+
+            if (
+                Number.isNaN(fromDate.getTime())
+            ) {
+
+                return res.status(400).json({
+                    message: "تاریخ شروع نامعتبر است."
+                });
+
+            }
+
+            conditions.push(
+                `o.created_at >= $${parameterIndex}::date`
+            );
+
+            values.push(dateFrom);
+
+            parameterIndex++;
+
+        }
+
+
+        // -------------------------------------------------
+        // Date To
+        // -------------------------------------------------
+
+        if (dateTo) {
+
+            const toDate = new Date(dateTo);
+
+            if (
+                Number.isNaN(toDate.getTime())
+            ) {
+
+                return res.status(400).json({
+                    message: "تاریخ پایان نامعتبر است."
+                });
+
+            }
+
+            conditions.push(
+                `o.created_at < ($${parameterIndex}::date + INTERVAL '1 day')`
+            );
+
+            values.push(dateTo);
+
+            parameterIndex++;
+
+        }
+
+
+        // -------------------------------------------------
+        // Where
+        // -------------------------------------------------
+
+        const whereClause =
+            `WHERE ${conditions.join(" AND ")}`;
+
+
+        // -------------------------------------------------
+        // Count
+        // -------------------------------------------------
+
+        const countResult = await pool.query(
+            `
+            SELECT COUNT(*) AS total
+
+            FROM orders o
+
+            ${whereClause}
+            `,
+            values
+        );
+
+        const total = parseInt(
+            countResult.rows[0].total,
+            10
+        );
+
+
+        // -------------------------------------------------
+        // Sorting
+        // -------------------------------------------------
+
+        const sortColumns = {
+            date: "o.created_at",
+            amount: "o.total_amount",
+            status: "o.status",
+            paymentStatus: "o.payment_status",
+            deliveryStatus: "o.delivery_status"
+        };
+
+        const selectedSortColumn =
+            sortColumns[sortBy] || "o.created_at";
+
+        const selectedSortOrder =
+            sortOrder === "asc" ? "ASC" : "DESC";
+
+
+        // -------------------------------------------------
+        // Orders
+        // -------------------------------------------------
+
+        const ordersResult = await pool.query(
+            `
+            SELECT
+                o.id,
+                o.total_amount,
+                o.status,
+                o.payment_status,
+                o.delivery_status,
+                o.delivery_address,
+
+                TO_CHAR(
+                    o.created_at,
+                    'YYYY-MM-DD HH24:MI:SS.MS'
+                ) AS created_at,
+
+                TO_CHAR(
+                    o.paid_at,
+                    'YYYY-MM-DD HH24:MI:SS.MS'
+                ) AS paid_at
+
+            FROM orders o
+
+            ${whereClause}
+
+            ORDER BY
+                ${selectedSortColumn} ${selectedSortOrder},
+                o.id DESC
+
+            LIMIT $${parameterIndex}
+            OFFSET $${parameterIndex + 1}
+            `,
+            [
+                ...values,
+                limit,
+                offset
+            ]
+        );
+
+
+        // -------------------------------------------------
+        // Response
+        // -------------------------------------------------
+
+        return res.status(200).json({
+
+            data: ordersResult.rows,
+
+            pagination: {
+
+                page,
+                limit,
+                total,
+
+                totalPages: Math.ceil(
+                    total / limit
+                )
+
+            }
+
+        });
+
+    }
+    catch (error) {
+
+        console.error(
+            "Get customer order history error:",
+            error
+        );
+
+        return res.status(500).json({
+            message: "خطا در دریافت تاریخچه سفارش‌ها."
+        });
+
+    }
+
+}
+
+// =====================================================
+// Customer Order Details
+// =====================================================
+
+async function getMyOrderById(req, res) {
+
+    try {
+
+        const customerId = req.customerId;
+
+        const orderId = Number(req.params.orderId);
+
+
+        // -------------------------------------------------
+        // Validate
+        // -------------------------------------------------
+
+        if (!customerId) {
+
+            return res.status(401).json({
+                message: "احراز هویت مشتری انجام نشده است."
+            });
+
+        }
+
+        if (
+            !Number.isSafeInteger(orderId) ||
+            orderId <= 0
+        ) {
+
+            return res.status(400).json({
+                message: "شناسه سفارش نامعتبر است."
+            });
+
+        }
+
+
+        // -------------------------------------------------
+        // Get order owned by customer
+        // -------------------------------------------------
+
+        const orderResult = await pool.query(
+            `
+            SELECT
+                o.id,
+                o.total_amount,
+                o.status,
+                o.payment_status,
+                o.delivery_status,
+                o.delivery_address,
+
+                TO_CHAR(
+                    o.created_at,
+                    'YYYY-MM-DD HH24:MI:SS.MS'
+                ) AS created_at,
+
+                TO_CHAR(
+                    o.paid_at,
+                    'YYYY-MM-DD HH24:MI:SS.MS'
+                ) AS paid_at
+
+            FROM orders o
+
+            WHERE
+                o.id = $1
+                AND o.customer_id = $2
+            `,
+            [
+                orderId,
+                customerId
+            ]
+        );
+
+
+        if (orderResult.rows.length === 0) {
+
+            return res.status(404).json({
+                message: "سفارش پیدا نشد."
+            });
+
+        }
+
+
+        const order = orderResult.rows[0];
+
+
+        // -------------------------------------------------
+        // Get order items
+        // -------------------------------------------------
+
+        const itemsResult = await pool.query(
+            `
+            SELECT
+                id,
+                product_id,
+                product_name,
+                unit_price,
+                quantity,
+                total_price
+
+            FROM order_items
+
+            WHERE order_id = $1
+
+            ORDER BY id ASC
+            `,
+            [orderId]
+        );
+
+
+        // -------------------------------------------------
+        // Get latest payment
+        // -------------------------------------------------
+
+        const paymentResult = await pool.query(
+            `
+            SELECT
+                id,
+                amount,
+                status,
+                reference_id,
+                gateway,
+                created_at,
+                paid_at
+
+            FROM payments
+
+            WHERE order_id = $1
+
+            ORDER BY id DESC
+
+            LIMIT 1
+            `,
+            [orderId]
+        );
+
+
+        const payment =
+            paymentResult.rows.length > 0
+                ? paymentResult.rows[0]
+                : null;
+
+
+        // -------------------------------------------------
+        // Response
+        // -------------------------------------------------
+
+        return res.status(200).json({
+
+            order,
+
+            items: itemsResult.rows,
+
+            payment
+
+        });
+
+    }
+    catch (error) {
+
+        console.error(
+            "Get customer order details error:",
+            error
+        );
+
+        return res.status(500).json({
+            message: "خطا در دریافت جزئیات سفارش."
+        });
+
+    }
+
+}
 // =====================================================
 // Exports
 // =====================================================
@@ -2244,5 +2798,7 @@ module.exports = {
     cancelPendingOrder,
     startPayment,
     testPaymentSuccess,
-    testPaymentFailed
+    testPaymentFailed,
+    getMyOrders,
+    getMyOrderById
 };

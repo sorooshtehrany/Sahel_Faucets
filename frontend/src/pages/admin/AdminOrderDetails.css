@@ -25,6 +25,8 @@
 
     font-size: 25px;
 
+    font-weight: 700;
+
     color: #1e293b;
 }
 
@@ -39,24 +41,44 @@
 
 
 .back-orders-button {
-    padding: 8px 13px;
+    display: inline-flex;
 
-    border: none;
+    align-items: center;
 
-    border-radius: 9px;
+    justify-content: center;
 
-    background: #f1f5f9;
+    padding: 9px 14px;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    background: #ffffff;
 
     color: #475569;
 
     font-family: inherit;
 
+    font-size: 13px;
+
     cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
 
 .back-orders-button:hover {
-    background: #e2e8f0;
+    background: #f8fafc;
+
+    border-color: #cbd5e1;
+
+    color: #1e293b;
+
+    transform: translateY(-1px);
 }
 
 
@@ -65,6 +87,14 @@
 ========================= */
 
 .order-status-large {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 105px;
+
     padding: 9px 16px;
 
     border-radius: 20px;
@@ -72,42 +102,48 @@
     font-size: 13px;
 
     font-weight: 700;
+
+    white-space: nowrap;
 }
 
 
 .order-status-large.paid {
     background: #dcfce7;
+
     color: #15803d;
 }
 
 
 .order-status-large.pending {
     background: #fef3c7;
+
     color: #b45309;
 }
 
 
 .order-status-large.failed {
     background: #fee2e2;
+
     color: #dc2626;
 }
 
 
 .order-status-large.cancelled {
     background: #e2e8f0;
+
     color: #475569;
 }
 
 
 /* =========================
-   Info
+   Main Info Grid
 ========================= */
 
 .order-info-grid {
     display: grid;
 
     grid-template-columns:
-        repeat(2, 1fr);
+        repeat(2, minmax(0, 1fr));
 
     gap: 20px;
 
@@ -115,13 +151,17 @@
 }
 
 
+/* =========================
+   Cards
+========================= */
+
 .order-info-card,
 .order-items-card {
     background:
-        rgba(255, 255, 255, 0.9);
+        rgba(255, 255, 255, 0.95);
 
     border:
-        1px solid rgba(148, 163, 184, 0.15);
+        1px solid rgba(148, 163, 184, 0.16);
 
     border-radius: 18px;
 
@@ -130,6 +170,21 @@
     box-shadow:
         0 8px 25px
         rgba(15, 23, 42, 0.05);
+
+    transition:
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.order-info-card:hover,
+.order-items-card:hover {
+    border-color:
+        rgba(148, 163, 184, 0.25);
+
+    box-shadow:
+        0 10px 30px
+        rgba(15, 23, 42, 0.07);
 }
 
 
@@ -139,9 +194,15 @@
 
     font-size: 17px;
 
+    font-weight: 700;
+
     color: #1e293b;
 }
 
+
+/* =========================
+   Info Rows
+========================= */
 
 .order-info-row {
     display: flex;
@@ -152,7 +213,9 @@
 
     gap: 20px;
 
-    padding: 13px 0;
+    min-height: 46px;
+
+    padding: 11px 0;
 
     border-bottom:
         1px solid #f1f5f9;
@@ -168,6 +231,8 @@
     color: #64748b;
 
     font-size: 13px;
+
+    white-space: nowrap;
 }
 
 
@@ -175,6 +240,12 @@
     color: #334155;
 
     font-size: 13px;
+
+    font-weight: 600;
+
+    text-align: left;
+
+    word-break: break-word;
 }
 
 
@@ -184,6 +255,233 @@
     color: #94a3b8;
 
     font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* =========================
+   Delivery Address
+========================= */
+
+.order-delivery-address-card {
+    grid-column: 1 / -1;
+}
+
+
+.delivery-address {
+    min-height: 70px;
+
+    padding: 17px 18px;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    background:
+        #f8fafc;
+
+    color: #334155;
+
+    font-size: 14px;
+
+    line-height: 2;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
+}
+
+
+.empty-delivery-address {
+    color: #94a3b8;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   Delivery Status
+========================= */
+
+.order-delivery-status-card {
+    grid-column: 1 / -1;
+}
+
+
+.delivery-status-text {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 7px 13px;
+
+    border-radius: 20px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+.delivery-status-control {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 8px;
+}
+
+
+.delivery-status-control select {
+    min-width: 210px;
+
+    padding: 11px 14px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.delivery-status-control select:hover {
+    border-color: #94a3b8;
+}
+
+
+.delivery-status-control select:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.10);
+}
+
+
+.delivery-status-final {
+    margin-top: 14px;
+
+    padding: 12px 15px;
+
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    line-height: 1.8;
+}
+
+
+.delivery-status-disabled {
+    margin-top: 14px;
+
+    padding: 12px 15px;
+
+    border-radius: 10px;
+
+    background: #fff7ed;
+
+    color: #c2410c;
+
+    font-size: 13px;
+
+    line-height: 1.8;
+}
+
+
+.delivery-status-loading {
+    margin-top: 12px;
+
+    color: #2563eb;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.delivery-status-error {
+    margin-top: 12px;
+
+    padding: 11px 14px;
+
+    border-radius: 10px;
+
+    background: #fee2e2;
+
+    color: #b91c1c;
+
+    font-size: 13px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   Delivery Status Colors
+========================= */
+
+.delivery-status-text.pending {
+    background: #fef3c7;
+
+    color: #b45309;
+}
+
+
+.delivery-status-text.preparing {
+    background: #dbeafe;
+
+    color: #1d4ed8;
+}
+
+
+.delivery-status-text.shipped {
+    background: #ede9fe;
+
+    color: #6d28d9;
+}
+
+
+.delivery-status-text.delivered {
+    background: #dcfce7;
+
+    color: #15803d;
+}
+
+
+.delivery-status-text.cancelled {
+    background: #fee2e2;
+
+    color: #dc2626;
 }
 
 
@@ -197,7 +495,14 @@
 
 
 .order-items-table-wrapper {
+    width: 100%;
+
     overflow-x: auto;
+
+    border:
+        1px solid #f1f5f9;
+
+    border-radius: 12px;
 }
 
 
@@ -220,6 +525,10 @@
     color: #64748b;
 
     font-size: 13px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
 }
 
 
@@ -232,10 +541,23 @@
     color: #334155;
 
     font-size: 13px;
+
+    vertical-align: middle;
 }
 
 
-.order-items-table tr:last-child td {
+.order-items-table tbody tr {
+    transition:
+        background 0.15s ease;
+}
+
+
+.order-items-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+
+.order-items-table tbody tr:last-child td {
     border-bottom: none;
 }
 
@@ -270,6 +592,8 @@
 .order-total strong {
     font-size: 20px;
 
+    font-weight: 700;
+
     color: #2563eb;
 }
 
@@ -284,6 +608,8 @@
     text-align: center;
 
     color: #64748b;
+
+    font-size: 14px;
 }
 
 
@@ -292,9 +618,16 @@
 
     background: #fee2e2;
 
+    border:
+        1px solid #fecaca;
+
     border-radius: 15px;
 
     color: #b91c1c;
+
+    font-size: 13px;
+
+    line-height: 1.8;
 }
 
 
@@ -313,7 +646,20 @@
 
     font-family: inherit;
 
+    font-size: 13px;
+
     cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.admin-order-error button:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
 }
 
 
@@ -321,13 +667,112 @@
    Responsive
 ========================= */
 
-@media (max-width: 800px) {
+@media (max-width: 1000px) {
 
     .order-info-grid {
         grid-template-columns: 1fr;
     }
 
+
+    .order-delivery-address-card,
+    .order-delivery-status-card {
+        grid-column: auto;
+    }
+}
+
+
+@media (max-width: 800px) {
+
     .order-details-header {
         flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .order-details-header h2 {
+        font-size: 22px;
+    }
+
+
+    .back-orders-button {
+        align-self: flex-start;
+    }
+
+
+    .order-info-card,
+    .order-items-card {
+        padding: 20px;
+    }
+
+
+    .order-info-row {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 6px;
+    }
+
+
+    .order-info-row strong {
+        text-align: right;
+    }
+
+
+    .delivery-status-control {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+
+    .delivery-status-control select {
+        width: 100%;
+
+        min-width: 0;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    .order-details-header {
+        gap: 14px;
+
+        margin-bottom: 20px;
+    }
+
+
+    .order-details-header h2 {
+        margin-top: 10px;
+
+        font-size: 20px;
+    }
+
+
+    .order-info-card,
+    .order-items-card {
+        padding: 16px;
+
+        border-radius: 15px;
+    }
+
+
+    .order-info-card h3,
+    .order-items-card h3 {
+        font-size: 16px;
+    }
+
+
+    .delivery-address {
+        padding: 14px;
+
+        font-size: 13px;
+    }
+
+
+    .order-total strong {
+        font-size: 18px;
     }
 }

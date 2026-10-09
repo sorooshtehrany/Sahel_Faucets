@@ -28,7 +28,8 @@ import Register from "./pages/Register.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import Cart from "./pages/Cart.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
-
+import MyOrders from "./pages/MyOrders.jsx";
+import MyOrderDetails from "./pages/MyOrderDetails.jsx";
 
 function AppContent() {
 
@@ -101,7 +102,15 @@ function AppContent() {
                     element={<PaymentPage />}
                 />
 
+                <Route
+                    path="/my-orders"
+                    element={<MyOrders />}
+                />
 
+                <Route
+                    path="/my-orders/:orderId"
+                    element={<MyOrderDetails />}
+                />
                 {/* =========================
                     Admin Routes
                 ========================= */}

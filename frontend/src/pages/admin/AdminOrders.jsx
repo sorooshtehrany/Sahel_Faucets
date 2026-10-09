@@ -7,6 +7,11 @@ import {
     useNavigate
 } from "react-router-dom";
 
+import {
+    gregorianToJalali,
+    jalaliToGregorian
+} from "../../utils/jalaliDate";
+
 import "./AdminOrders.css";
 
 
@@ -26,8 +31,46 @@ function AdminOrders() {
     const [pagination, setPagination] =
         useState(null);
 
-    const [status, setStatus] =
+
+    // -------------------------------------------------
+    // Filter inputs
+    // -------------------------------------------------
+
+    const [searchInput, setSearchInput] =
         useState("");
+
+    const [paymentStatusInput, setPaymentStatusInput] =
+        useState("");
+
+    const [deliveryStatusInput, setDeliveryStatusInput] =
+        useState("");
+
+    const [dateFromInput, setDateFromInput] =
+        useState("");
+
+    const [dateToInput, setDateToInput] =
+        useState("");
+
+
+    // -------------------------------------------------
+    // Applied filters
+    // -------------------------------------------------
+
+    const [search, setSearch] =
+        useState("");
+
+    const [paymentStatus, setPaymentStatus] =
+        useState("");
+
+    const [deliveryStatus, setDeliveryStatus] =
+        useState("");
+
+    const [dateFrom, setDateFrom] =
+        useState("");
+
+    const [dateTo, setDateTo] =
+        useState("");
+
 
     const [page, setPage] =
         useState(1);
@@ -41,6 +84,10 @@ function AdminOrders() {
 
     const limit = 10;
 
+
+    // -------------------------------------------------
+    // Load orders
+    // -------------------------------------------------
 
     async function loadOrders() {
 
@@ -57,16 +104,60 @@ function AdminOrders() {
 
             const params =
                 new URLSearchParams({
-                    page: page.toString(),
-                    limit: limit.toString()
+                    page:
+                        page.toString(),
+
+                    limit:
+                        limit.toString()
                 });
 
 
-            if (status) {
+            // Search
+            if (search) {
 
                 params.append(
-                    "status",
-                    status
+                    "search",
+                    search
+                );
+            }
+
+
+            // Payment status
+            if (paymentStatus) {
+
+                params.append(
+                    "paymentStatus",
+                    paymentStatus
+                );
+            }
+
+
+            // Delivery status
+            if (deliveryStatus) {
+
+                params.append(
+                    "deliveryStatus",
+                    deliveryStatus
+                );
+            }
+
+
+            // Date from
+            if (dateFrom) {
+
+                params.append(
+                    "dateFrom",
+                    dateFrom
+                );
+            }
+
+
+            // Date to
+            if (dateTo) {
+
+                params.append(
+                    "dateTo",
+                    dateTo
                 );
             }
 
@@ -125,31 +216,163 @@ function AdminOrders() {
         finally {
 
             setLoading(false);
-
         }
     }
 
+
+    // -------------------------------------------------
+    // Load when filters or page change
+    // -------------------------------------------------
 
     useEffect(() => {
 
         loadOrders();
 
-    }, [page, status]);
+    }, [
+        page,
+        search,
+        paymentStatus,
+        deliveryStatus,
+        dateFrom,
+        dateTo
+    ]);
 
 
-    function handleStatusChange(event) {
+    // -------------------------------------------------
+    // Apply filters
+    // -------------------------------------------------
 
-        setStatus(
-            event.target.value
+    function handleApplyFilters() {
+
+        if (
+            dateFromInput &&
+            dateToInput &&
+            dateFromInput > dateToInput
+        ) {
+
+            setError(
+                "تاریخ شروع نمی‌تواند بعد از تاریخ پایان باشد."
+            );
+
+            return;
+        }
+
+
+        // Validate Jalali dates
+
+        if (
+            dateFromInput &&
+            !jalaliToGregorian(
+                dateFromInput
+            )
+        ) {
+
+            setError(
+                "تاریخ شروع نامعتبر است."
+            );
+
+            return;
+        }
+
+
+        if (
+            dateToInput &&
+            !jalaliToGregorian(
+                dateToInput
+            )
+        ) {
+
+            setError(
+                "تاریخ پایان نامعتبر است."
+            );
+
+            return;
+        }
+
+
+        setError("");
+
+
+        // Convert Jalali → Gregorian
+        const gregorianFrom =
+            jalaliToGregorian(
+                dateFromInput
+            );
+
+        const gregorianTo =
+            jalaliToGregorian(
+                dateToInput
+            );
+
+
+        // Apply filters
+
+        setSearch(
+            searchInput.trim()
         );
+
+        setPaymentStatus(
+            paymentStatusInput
+        );
+
+        setDeliveryStatus(
+            deliveryStatusInput
+        );
+
+        setDateFrom(
+            gregorianFrom
+        );
+
+        setDateTo(
+            gregorianTo
+        );
+
 
         setPage(1);
     }
 
 
-    function getStatusText(orderStatus) {
+    // -------------------------------------------------
+    // Clear filters
+    // -------------------------------------------------
 
-        switch (orderStatus) {
+    function handleClearFilters() {
+
+        setSearchInput("");
+
+        setPaymentStatusInput("");
+
+        setDeliveryStatusInput("");
+
+        setDateFromInput("");
+
+        setDateToInput("");
+
+
+        setSearch("");
+
+        setPaymentStatus("");
+
+        setDeliveryStatus("");
+
+        setDateFrom("");
+
+        setDateTo("");
+
+
+        setError("");
+
+        setPage(1);
+    }
+
+
+    // -------------------------------------------------
+    // Payment status text
+    // -------------------------------------------------
+
+    function getPaymentStatusText(status) {
+
+        switch (status) {
 
             case "paid":
                 return "پرداخت‌شده";
@@ -164,10 +387,43 @@ function AdminOrders() {
                 return "لغوشده";
 
             default:
-                return orderStatus || "-";
+                return status || "-";
         }
     }
 
+
+    // -------------------------------------------------
+    // Delivery status text
+    // -------------------------------------------------
+
+    function getDeliveryStatusText(status) {
+
+        switch (status) {
+
+            case "pending":
+                return "در انتظار پردازش";
+
+            case "preparing":
+                return "در حال آماده‌سازی";
+
+            case "shipped":
+                return "ارسال شده";
+
+            case "delivered":
+                return "تحویل شده";
+
+            case "cancelled":
+                return "لغو شده";
+
+            default:
+                return status || "-";
+        }
+    }
+
+
+    // -------------------------------------------------
+    // Format price
+    // -------------------------------------------------
 
     function formatPrice(price) {
 
@@ -176,6 +432,10 @@ function AdminOrders() {
     }
 
 
+    // -------------------------------------------------
+    // Format date
+    // -------------------------------------------------
+
     function formatDate(date) {
 
         if (!date) {
@@ -183,10 +443,28 @@ function AdminOrders() {
         }
 
 
-        return new Date(date)
-            .toLocaleString("fa-IR");
+        try {
+
+            return gregorianToJalali(
+                date
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Date formatting error:",
+                error
+            );
+
+            return "-";
+        }
     }
 
+
+    // -------------------------------------------------
+    // Render
+    // -------------------------------------------------
 
     return (
 
@@ -195,9 +473,10 @@ function AdminOrders() {
             dir="rtl"
         >
 
-            {/* =========================
-                Header
-            ========================= */}
+
+            {/* ----------------------------------------- */}
+            {/* Header */}
+            {/* ----------------------------------------- */}
 
             <div className="admin-page-header">
 
@@ -213,18 +492,72 @@ function AdminOrders() {
 
                 </div>
 
+            </div>
 
-                <div className="admin-filter">
+
+            {/* ----------------------------------------- */}
+            {/* Filters */}
+            {/* ----------------------------------------- */}
+
+            <div className="admin-orders-filters">
+
+
+                {/* Search */}
+
+                <div
+                    className={
+                        "admin-filter-group search-filter"
+                    }
+                >
+
+                    <label>
+                        جستجو
+                    </label>
+
+                    <input
+                        type="text"
+                        value={searchInput}
+                        onChange={(event) =>
+                            setSearchInput(
+                                event.target.value
+                            )
+                        }
+                        onKeyDown={(event) => {
+
+                            if (
+                                event.key === "Enter"
+                            ) {
+
+                                handleApplyFilters();
+                            }
+                        }}
+                        placeholder={
+                            "نام، نام خانوادگی، تلفن یا شماره سفارش"
+                        }
+                    />
+
+                </div>
+
+
+                {/* Payment status */}
+
+                <div className="admin-filter-group">
+
+                    <label>
+                        وضعیت پرداخت
+                    </label>
 
                     <select
-                        value={status}
-                        onChange={
-                            handleStatusChange
+                        value={paymentStatusInput}
+                        onChange={(event) =>
+                            setPaymentStatusInput(
+                                event.target.value
+                            )
                         }
                     >
 
                         <option value="">
-                            همه سفارش‌ها
+                            همه
                         </option>
 
                         <option value="paid">
@@ -247,12 +580,134 @@ function AdminOrders() {
 
                 </div>
 
+
+                {/* Delivery status */}
+
+                <div className="admin-filter-group">
+
+                    <label>
+                        وضعیت ارسال
+                    </label>
+
+                    <select
+                        value={deliveryStatusInput}
+                        onChange={(event) =>
+                            setDeliveryStatusInput(
+                                event.target.value
+                            )
+                        }
+                    >
+
+                        <option value="">
+                            همه
+                        </option>
+
+                        <option value="pending">
+                            در انتظار پردازش
+                        </option>
+
+                        <option value="preparing">
+                            در حال آماده‌سازی
+                        </option>
+
+                        <option value="shipped">
+                            ارسال شده
+                        </option>
+
+                        <option value="delivered">
+                            تحویل شده
+                        </option>
+
+                        <option value="cancelled">
+                            لغو شده
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                {/* From Jalali date */}
+
+                <div className="admin-filter-group">
+
+                    <label>
+                        از تاریخ
+                    </label>
+
+                    <input
+                        type="text"
+                        value={dateFromInput}
+                        onChange={(event) =>
+                            setDateFromInput(
+                                event.target.value
+                            )
+                        }
+                        placeholder="1405/07/01"
+                        dir="ltr"
+                    />
+
+                </div>
+
+
+                {/* To Jalali date */}
+
+                <div className="admin-filter-group">
+
+                    <label>
+                        تا تاریخ
+                    </label>
+
+                    <input
+                        type="text"
+                        value={dateToInput}
+                        onChange={(event) =>
+                            setDateToInput(
+                                event.target.value
+                            )
+                        }
+                        placeholder="1405/07/09"
+                        dir="ltr"
+                    />
+
+                </div>
+
+
+                {/* Filter buttons */}
+
+                <div className="admin-filter-actions">
+
+                    <button
+                        className={
+                            "admin-apply-filter-button"
+                        }
+                        onClick={
+                            handleApplyFilters
+                        }
+                    >
+                        اعمال فیلتر
+                    </button>
+
+
+                    <button
+                        className={
+                            "admin-clear-filter-button"
+                        }
+                        onClick={
+                            handleClearFilters
+                        }
+                    >
+                        پاک کردن
+                    </button>
+
+                </div>
+
             </div>
 
 
-            {/* =========================
-                Error
-            ========================= */}
+            {/* ----------------------------------------- */}
+            {/* Error */}
+            {/* ----------------------------------------- */}
 
             {error && (
 
@@ -265,9 +720,9 @@ function AdminOrders() {
             )}
 
 
-            {/* =========================
-                Table
-            ========================= */}
+            {/* ----------------------------------------- */}
+            {/* Orders */}
+            {/* ----------------------------------------- */}
 
             <div className="admin-table-card">
 
@@ -283,7 +738,7 @@ function AdminOrders() {
 
                     <div className="admin-empty">
 
-                        سفارشی پیدا نشد.
+                        سفارشی با این مشخصات پیدا نشد.
 
                     </div>
 
@@ -310,11 +765,15 @@ function AdminOrders() {
                                     </th>
 
                                     <th>
-                                        وضعیت
+                                        پرداخت
                                     </th>
 
                                     <th>
-                                         تاریخ و ساعت 
+                                        ارسال
+                                    </th>
+
+                                    <th>
+                                        تاریخ و ساعت
                                     </th>
 
                                 </tr>
@@ -328,8 +787,14 @@ function AdminOrders() {
                                     (order) => (
 
                                         <tr
-                                            key={order.id}
-                                            className="admin-order-row"
+                                            key={
+                                                order.id
+                                            }
+
+                                            className={
+                                                "admin-order-row"
+                                            }
+
                                             onClick={() =>
                                                 navigate(
                                                     `/admin/orders/${order.id}`
@@ -337,24 +802,35 @@ function AdminOrders() {
                                             }
                                         >
 
+                                            {/* Order number */}
+
                                             <td>
 
-                                                #{order.id}
+                                                <strong>
+                                                    #{order.id}
+                                                </strong>
 
                                             </td>
 
+
+                                            {/* Customer */}
 
                                             <td>
 
                                                 <div className="customer-cell">
 
                                                     <strong>
+
                                                         {
                                                             order.first_name
-                                                        }{" "}
+                                                        }
+
+                                                        {" "}
+
                                                         {
                                                             order.last_name
                                                         }
+
                                                     </strong>
 
                                                     <small>
@@ -368,37 +844,72 @@ function AdminOrders() {
                                             </td>
 
 
+                                            {/* Amount */}
+
                                             <td>
 
-                                                {
-                                                    formatPrice(
-                                                        order.total_amount
-                                                    )
-                                                }
+                                                <span>
+
+                                                    {
+                                                        formatPrice(
+                                                            order.total_amount
+                                                        )
+                                                    }
+
+                                                </span>
 
                                                 <span className="currency">
-                                                    تومان
+
+                                                    {" "}تومان
+
                                                 </span>
 
                                             </td>
 
+
+                                            {/* Payment status */}
 
                                             <td>
 
                                                 <span
                                                     className={
-                                                        `order-status ${order.status}`
+                                                        `order-status ${order.payment_status}`
                                                     }
                                                 >
+
                                                     {
-                                                        getStatusText(
-                                                            order.status
+                                                        getPaymentStatusText(
+                                                            order.payment_status
                                                         )
                                                     }
+
                                                 </span>
 
                                             </td>
 
+
+                                            {/* Delivery status */}
+
+                                            <td>
+
+                                                <span
+                                                    className={
+                                                        `delivery-status ${order.delivery_status}`
+                                                    }
+                                                >
+
+                                                    {
+                                                        getDeliveryStatusText(
+                                                            order.delivery_status
+                                                        )
+                                                    }
+
+                                                </span>
+
+                                            </td>
+
+
+                                            {/* Date */}
 
                                             <td>
 
@@ -426,9 +937,9 @@ function AdminOrders() {
             </div>
 
 
-            {/* =========================
-                Pagination
-            ========================= */}
+            {/* ----------------------------------------- */}
+            {/* Pagination */}
+            {/* ----------------------------------------- */}
 
             {pagination &&
                 pagination.totalPages > 1 && (
@@ -439,6 +950,7 @@ function AdminOrders() {
                             disabled={
                                 page <= 1
                             }
+
                             onClick={() =>
                                 setPage(
                                     page - 1
@@ -454,13 +966,17 @@ function AdminOrders() {
                             صفحه{" "}
 
                             <strong>
-                                {pagination.page}
+                                {
+                                    pagination.page
+                                }
                             </strong>
 
                             {" "}از{" "}
 
                             <strong>
-                                {pagination.totalPages}
+                                {
+                                    pagination.totalPages
+                                }
                             </strong>
 
                         </span>
@@ -471,6 +987,7 @@ function AdminOrders() {
                                 page >=
                                 pagination.totalPages
                             }
+
                             onClick={() =>
                                 setPage(
                                     page + 1

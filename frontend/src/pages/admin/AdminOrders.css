@@ -45,7 +45,235 @@
 
 
 /* =========================
-   Filter
+   Filters
+========================= */
+
+.admin-orders-filters {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: flex-end;
+
+    gap: 14px;
+
+    margin-bottom: 22px;
+
+    padding: 18px;
+
+    background:
+        rgba(255, 255, 255, 0.9);
+
+    border:
+        1px solid rgba(148, 163, 184, 0.15);
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 6px 20px
+        rgba(15, 23, 42, 0.04);
+}
+
+
+/* =========================
+   Filter Group
+========================= */
+
+.admin-filter-group {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 160px;
+}
+
+
+.admin-filter-group.search-filter {
+    flex: 1;
+
+    min-width: 220px;
+}
+
+
+.admin-filter-group label {
+    color: #475569;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+/* =========================
+   Filter Inputs
+========================= */
+
+.admin-filter-group input,
+.admin-filter-group select {
+    box-sizing: border-box;
+
+    width: 100%;
+
+    height: 42px;
+
+    padding: 10px 13px;
+
+    border:
+        1px solid #dbe3ec;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.admin-filter-group input::placeholder {
+    color: #94a3b8;
+}
+
+
+.admin-filter-group input:focus,
+.admin-filter-group select:focus {
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(59, 130, 246, 0.1);
+}
+
+
+.admin-filter-group select {
+    cursor: pointer;
+}
+
+
+/* =========================
+   Jalali Date Input
+========================= */
+
+.admin-date-input {
+    direction: ltr;
+
+    text-align: left;
+
+    letter-spacing: 0.3px;
+}
+
+
+.admin-date-input::placeholder {
+    direction: ltr;
+
+    text-align: left;
+}
+
+
+/* =========================
+   Filter Actions
+========================= */
+
+.admin-filter-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    height: 42px;
+}
+
+
+.admin-apply-filter-button,
+.admin-clear-filter-button {
+    height: 42px;
+
+    padding:
+        0 16px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+/* =========================
+   Apply Filter
+========================= */
+
+.admin-apply-filter-button {
+    background: #2563eb;
+
+    color: white;
+}
+
+
+.admin-apply-filter-button:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 12px
+        rgba(37, 99, 235, 0.2);
+}
+
+
+.admin-apply-filter-button:active {
+    transform: translateY(0);
+}
+
+
+/* =========================
+   Clear Filter
+========================= */
+
+.admin-clear-filter-button {
+    background: #f1f5f9;
+
+    color: #475569;
+}
+
+
+.admin-clear-filter-button:hover {
+    background: #e2e8f0;
+
+    transform: translateY(-1px);
+}
+
+
+.admin-clear-filter-button:active {
+    transform: translateY(0);
+}
+
+
+/* =========================
+   Old Filter Compatibility
 ========================= */
 
 .admin-filter select {
@@ -114,7 +342,7 @@
 
     border-collapse: collapse;
 
-    min-width: 750px;
+    min-width: 900px;
 }
 
 
@@ -216,7 +444,7 @@
 
 
 /* =========================
-   Status
+   Payment Status
 ========================= */
 
 .order-status {
@@ -259,6 +487,75 @@
     background: #e2e8f0;
 
     color: #475569;
+}
+
+
+/* =========================
+   Delivery Status
+========================= */
+
+.delivery-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    white-space: nowrap;
+
+    padding: 6px 11px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.delivery-status.pending {
+    background: #fef3c7;
+
+    color: #b45309;
+}
+
+
+.delivery-status.preparing {
+    background: #dbeafe;
+
+    color: #2563eb;
+}
+
+
+.delivery-status.shipped {
+    background: #e0e7ff;
+
+    color: #4338ca;
+}
+
+
+.delivery-status.delivered {
+    background: #dcfce7;
+
+    color: #15803d;
+}
+
+
+.delivery-status.cancelled {
+    background: #fee2e2;
+
+    color: #dc2626;
+}
+
+
+/* =========================
+   Order Date
+========================= */
+
+.order-date {
+    white-space: nowrap;
+
+    color: #64748b;
+
+    font-size: 13px;
 }
 
 
@@ -355,6 +652,29 @@
    Responsive
 ========================= */
 
+@media (max-width: 1000px) {
+
+    .admin-orders-filters {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .admin-filter-group.search-filter {
+        min-width: 0;
+
+        grid-column: span 2;
+    }
+
+
+    .admin-filter-actions {
+        grid-column: span 2;
+    }
+}
+
+
 @media (max-width: 700px) {
 
     .admin-page-header {
@@ -364,7 +684,32 @@
     }
 
 
-    .admin-filter select {
+    .admin-orders-filters {
+        grid-template-columns: 1fr;
+
+        padding: 14px;
+    }
+
+
+    .admin-filter-group.search-filter {
+        grid-column: span 1;
+    }
+
+
+    .admin-filter-actions {
+        grid-column: span 1;
+
         width: 100%;
+    }
+
+
+    .admin-apply-filter-button,
+    .admin-clear-filter-button {
+        flex: 1;
+    }
+
+
+    .admin-table {
+        min-width: 850px;
     }
 }

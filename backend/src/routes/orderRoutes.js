@@ -6,7 +6,9 @@ const {
     cancelPendingOrder,
     startPayment,
     testPaymentSuccess,
-    testPaymentFailed
+    testPaymentFailed,
+    getMyOrders,
+    getMyOrderById
 } = require("../controllers/orderController");
 
 const authenticateToken =
@@ -27,6 +29,19 @@ const router =
         cancelPendingOrder
     );
     
+    router.get(
+        "/history",
+        authenticateToken,
+        getMyOrders
+    );
+    
+    router.get(
+        "/history/:orderId",
+        authenticateToken,
+        getMyOrderById
+    );
+
+
     router.post(
         "/:orderId/payment/start",
         authenticateToken,

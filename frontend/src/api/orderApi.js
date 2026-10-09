@@ -160,3 +160,98 @@ export async function testPaymentFailed(orderId) {
 
     return data;
 }
+
+// =====================================================
+// Get My Orders
+// =====================================================
+
+export async function getMyOrders(filters = {}) {
+
+    const params = new URLSearchParams();
+
+    Object.entries(filters).forEach(
+        ([key, value]) => {
+
+            if (
+                value !== undefined &&
+                value !== null &&
+                value !== ""
+            ) {
+                params.append(
+                    key,
+                    String(value)
+                );
+            }
+
+        }
+    );
+
+
+    const queryString =
+        params.toString();
+
+
+    const response =
+        await fetch(
+            `${API_BASE_URL}/orders/history${
+                queryString
+                    ? `?${queryString}`
+                    : ""
+            }`,
+            {
+                method: "GET",
+                headers: getAuthHeaders()
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.message ||
+            "خطا در دریافت سوابق خرید"
+        );
+
+    }
+
+
+    return data;
+}
+
+
+// =====================================================
+// Get My Order Details
+// =====================================================
+
+export async function getMyOrderById(orderId) {
+
+    const response =
+        await fetch(
+            `${API_BASE_URL}/orders/history/${encodeURIComponent(orderId)}`,
+            {
+                method: "GET",
+                headers: getAuthHeaders()
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.message ||
+            "خطا در دریافت جزئیات سفارش"
+        );
+
+    }
+
+
+    return data;
+}

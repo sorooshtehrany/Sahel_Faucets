@@ -799,7 +799,12 @@ function Cart() {
 
                     </div>
 
-
+                    <Link
+                        to="/my-orders"
+                        className="cart-history-button"
+                    >
+                        سوابق خرید من
+                    </Link>
                     {items.length > 0 && (
 
                         <button

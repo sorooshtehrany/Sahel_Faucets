@@ -1,3 +1,4 @@
+
 import {
     useEffect,
     useState
@@ -7,6 +8,10 @@ import {
     useNavigate,
     useParams
 } from "react-router-dom";
+
+import {
+    gregorianToJalali
+} from "../../utils/jalaliDate";
 
 import "./AdminOrderDetails.css";
 
@@ -34,6 +39,20 @@ function AdminOrderDetails() {
     const [error, setError] =
         useState("");
 
+
+    const [deliveryStatus, setDeliveryStatus] =
+        useState("");
+
+    const [updatingDeliveryStatus, setUpdatingDeliveryStatus] =
+        useState(false);
+
+    const [deliveryError, setDeliveryError] =
+        useState("");
+
+
+    // -------------------------------------------------
+    // Load order
+    // -------------------------------------------------
 
     async function loadOrder() {
 
@@ -77,6 +96,10 @@ function AdminOrderDetails() {
 
             setOrder(data);
 
+            setDeliveryStatus(
+                data.order.delivery_status || ""
+            );
+
         }
         catch (error) {
 
@@ -98,12 +121,126 @@ function AdminOrderDetails() {
     }
 
 
+    // -------------------------------------------------
+    // Update delivery status
+    // -------------------------------------------------
+
+    async function updateDeliveryStatus(
+        newStatus
+    ) {
+
+        if (
+            !newStatus ||
+            newStatus === deliveryStatus
+        ) {
+            return;
+        }
+
+
+        try {
+
+            setUpdatingDeliveryStatus(true);
+
+            setDeliveryError("");
+
+
+            const token =
+                localStorage.getItem("token");
+
+
+            const response =
+                await fetch(
+                    `${API_BASE_URL}/admin/orders/${orderId}/delivery-status`,
+                    {
+                        method: "PATCH",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+
+                            Authorization:
+                                `Bearer ${token}`
+                        },
+
+                        body: JSON.stringify({
+                            delivery_status:
+                                newStatus
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "خطا در تغییر وضعیت ارسال"
+                );
+            }
+
+
+            const updatedStatus =
+                data.order.delivery_status;
+
+
+            setDeliveryStatus(
+                updatedStatus
+            );
+
+
+            setOrder(
+                (previousOrder) => ({
+
+                    ...previousOrder,
+
+                    order: {
+
+                        ...previousOrder.order,
+
+                        delivery_status:
+                            updatedStatus
+
+                    }
+
+                })
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Delivery status update error:",
+                error
+            );
+
+
+            setDeliveryError(
+                error.message ||
+                "خطایی در تغییر وضعیت ارسال رخ داد."
+            );
+
+        }
+        finally {
+
+            setUpdatingDeliveryStatus(false);
+        }
+    }
+
+
     useEffect(() => {
 
         loadOrder();
 
     }, [orderId]);
 
+
+    // -------------------------------------------------
+    // Status text
+    // -------------------------------------------------
 
     function getStatusText(status) {
 
@@ -127,6 +264,68 @@ function AdminOrderDetails() {
     }
 
 
+    function getDeliveryStatusText(status) {
+
+        switch (status) {
+
+            case "pending":
+                return "در انتظار پردازش";
+
+            case "preparing":
+                return "در حال آماده‌سازی";
+
+            case "shipped":
+                return "ارسال شده";
+
+            case "delivered":
+                return "تحویل شده";
+
+            case "cancelled":
+                return "لغو شده";
+
+            default:
+                return status || "-";
+        }
+    }
+
+
+    // -------------------------------------------------
+    // Allowed next delivery statuses
+    // -------------------------------------------------
+
+    function getNextDeliveryStatuses(
+        status
+    ) {
+
+        switch (status) {
+
+            case "pending":
+                return [
+                    "preparing",
+                    "cancelled"
+                ];
+
+            case "preparing":
+                return [
+                    "shipped",
+                    "cancelled"
+                ];
+
+            case "shipped":
+                return [
+                    "delivered"
+                ];
+
+            default:
+                return [];
+        }
+    }
+
+
+    // -------------------------------------------------
+    // Price
+    // -------------------------------------------------
+
     function formatPrice(price) {
 
         return Number(price || 0)
@@ -134,16 +333,45 @@ function AdminOrderDetails() {
     }
 
 
+    // -------------------------------------------------
+    // Jalali date
+    // -------------------------------------------------
+
     function formatDate(date) {
 
         if (!date) {
             return "-";
         }
 
-        return new Date(date)
-            .toLocaleString("fa-IR");
+
+        const datePart =
+            String(date)
+                .slice(0, 10);
+
+
+        const timePart =
+            String(date)
+                .slice(11, 19);
+
+
+        const jalaliDate =
+            gregorianToJalali(
+                datePart
+            );
+
+
+        if (!jalaliDate) {
+            return "-";
+        }
+
+
+        return `${jalaliDate} - ${timePart}`;
     }
 
+
+    // -------------------------------------------------
+    // Loading
+    // -------------------------------------------------
 
     if (loading) {
 
@@ -157,6 +385,10 @@ function AdminOrderDetails() {
     }
 
 
+    // -------------------------------------------------
+    // Error
+    // -------------------------------------------------
+
     if (error) {
 
         return (
@@ -168,6 +400,7 @@ function AdminOrderDetails() {
                 <p>
                     {error}
                 </p>
+
 
                 <button
                     onClick={() =>
@@ -185,6 +418,31 @@ function AdminOrderDetails() {
     if (!order) {
         return null;
     }
+
+
+    const currentDeliveryStatus =
+        order.order.delivery_status;
+
+
+    const nextDeliveryStatuses =
+        getNextDeliveryStatuses(
+            currentDeliveryStatus
+        );
+
+
+    const deliveryStatusIsFinal =
+        currentDeliveryStatus === "delivered" ||
+        currentDeliveryStatus === "cancelled";
+
+
+    const orderIsPaid =
+        order.order.payment_status === "paid";
+
+
+    const deliveryUpdateDisabled =
+        updatingDeliveryStatus ||
+        deliveryStatusIsFinal ||
+        !orderIsPaid;
 
 
     return (
@@ -211,9 +469,11 @@ function AdminOrderDetails() {
                         ← بازگشت به سفارش‌ها
                     </button>
 
+
                     <h2>
                         سفارش #{order.order.id}
                     </h2>
+
 
                     <p>
                         ثبت شده در{" "}
@@ -239,16 +499,21 @@ function AdminOrderDetails() {
 
 
             {/* =========================
-                Customer
+                Customer / Payment
             ========================= */}
 
             <div className="order-info-grid">
+
+                {/* =========================
+                    Customer
+                ========================= */}
 
                 <div className="order-info-card">
 
                     <h3>
                         اطلاعات مشتری
                     </h3>
+
 
                     <div className="order-info-row">
 
@@ -302,9 +567,11 @@ function AdminOrderDetails() {
                         آخرین پرداخت
                     </h3>
 
+
                     {order.payment ? (
 
                         <>
+
                             <div className="order-info-row">
 
                                 <span>
@@ -312,7 +579,9 @@ function AdminOrderDetails() {
                                 </span>
 
                                 <strong>
-                                    {order.payment.status}
+                                    {getStatusText(
+                                        order.payment.status
+                                    )}
                                 </strong>
 
                             </div>
@@ -357,6 +626,148 @@ function AdminOrderDetails() {
                     )}
 
                 </div>
+
+            </div>
+
+
+            {/* =========================
+                Delivery Address
+            ========================= */}
+
+            <div className="order-info-card order-delivery-address-card">
+
+                <h3>
+                    آدرس تحویل
+                </h3>
+
+
+                <div className="delivery-address">
+
+                    {order.order.delivery_address || (
+                        <span className="empty-delivery-address">
+                            آدرس تحویل ثبت نشده است.
+                        </span>
+                    )}
+
+                </div>
+
+            </div>
+
+
+            {/* =========================
+                Delivery Status
+            ========================= */}
+
+            <div className="order-info-card order-delivery-status-card">
+
+                <h3>
+                    وضعیت ارسال سفارش
+                </h3>
+
+
+                <div className="order-info-row">
+
+                    <span>
+                        وضعیت فعلی
+                    </span>
+
+                    <strong
+                        className={
+                            `delivery-status-text ${currentDeliveryStatus}`
+                        }
+                    >
+                        {getDeliveryStatusText(
+                            currentDeliveryStatus
+                        )}
+                    </strong>
+
+                </div>
+
+
+                {deliveryStatusIsFinal ? (
+
+                    <div className="delivery-status-final">
+
+                        این سفارش به مرحله نهایی رسیده و
+                        وضعیت ارسال آن دیگر قابل تغییر نیست.
+
+                    </div>
+
+                ) : !orderIsPaid ? (
+
+                    <div className="delivery-status-disabled">
+
+                        وضعیت ارسال فقط پس از پرداخت موفق
+                        سفارش قابل تغییر است.
+
+                    </div>
+
+                ) : (
+
+                    <div className="delivery-status-control">
+
+                        <label>
+                            تغییر وضعیت
+                        </label>
+
+
+                        <select
+                            value=""
+                            disabled={
+                                deliveryUpdateDisabled
+                            }
+                            onChange={(event) =>
+                                updateDeliveryStatus(
+                                    event.target.value
+                                )
+                            }
+                        >
+
+                            <option value="">
+                                انتخاب وضعیت بعدی
+                            </option>
+
+
+                            {nextDeliveryStatuses.map(
+                                (status) => (
+
+                                    <option
+                                        key={status}
+                                        value={status}
+                                    >
+                                        {getDeliveryStatusText(
+                                            status
+                                        )}
+                                    </option>
+
+                                )
+                            )}
+
+                        </select>
+
+
+                        {updatingDeliveryStatus && (
+
+                            <span className="delivery-status-loading">
+                                در حال بروزرسانی...
+                            </span>
+
+                        )}
+
+                    </div>
+
+                )}
+
+
+                {deliveryError && (
+
+                    <div className="delivery-status-error">
+
+                        {deliveryError}
+
+                    </div>
+
+                )}
 
             </div>
 
@@ -472,3 +883,4 @@ function AdminOrderDetails() {
 
 
 export default AdminOrderDetails;
+
