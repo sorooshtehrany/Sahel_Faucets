@@ -11,7 +11,8 @@ const {
 const {
     getAdminOrders,
     getAdminOrderById,
-    getAdminDashboard
+    getAdminDashboard,
+    updateAdminOrderDeliveryStatus
 } = require("../controllers/adminOrderController");
 
 const authenticateToken =
@@ -134,6 +135,12 @@ const router =
         updateAdminSeries
     );
     
+    router.patch(
+        "/orders/:orderId/delivery-status",
+        authenticateToken,
+        requireAdmin,
+        updateAdminOrderDeliveryStatus
+    );
     
     router.delete(
         "/series/:id",
