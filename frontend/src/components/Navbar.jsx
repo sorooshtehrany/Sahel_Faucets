@@ -188,7 +188,7 @@ function Navbar() {
             try {
 
                 const response = await fetch(
-                    "http://localhost:3000/api/cart",
+                    "/api/cart",
                     {
                         method: "GET",
                         headers: {

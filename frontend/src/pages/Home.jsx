@@ -1,8 +1,17 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { setPageSeo } from "../utils/seo.js";
 import ProductSearch from "../components/ProductSearch.jsx";
 
 function Home() {
+
+    useEffect(() => {
+        setPageSeo({
+            title: "فروش شیرآلات بهداشتی ساحل | تنوع مدل و طراحی",
+            description: "فروشگاه شیرآلات بهداشتی ساحل؛ آشنایی با مجموعه شیرآلات، مدل‌ها و سری‌های مختلف با طراحی زیبا و کیفیت ماندگار.",
+            path: "/",
+        });
+    }, []);
 
     useEffect(() => {
 

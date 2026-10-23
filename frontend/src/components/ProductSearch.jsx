@@ -32,7 +32,7 @@ function ProductSearch() {
                 setLoading(true);
 
                 const response = await fetch(
-                    `http://localhost:3000/api/products/search?q=${encodeURIComponent(text)}`
+                    `/api/products/search?q=${encodeURIComponent(text)}`
                 );
 
                 if (!response.ok) {

@@ -79,7 +79,7 @@ function AppContent() {
 
                 <Route
                     path="/home"
-                    element={<Home />}
+                    element={<Navigate to="/" replace />}
                 />
 
                 <Route
@@ -157,12 +157,7 @@ function AppContent() {
 
                 <Route
                     path="/"
-                    element={
-                        <Navigate
-                            to="/home"
-                            replace
-                        />
-                    }
+                    element={<Home />}
                 />
 
                 <Route

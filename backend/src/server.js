@@ -23,7 +23,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 
 const PORT = 3000;
+const HOST = "127.0.0.1";
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+    console.log(`Server is running on http://${HOST}:${PORT}`);
 });

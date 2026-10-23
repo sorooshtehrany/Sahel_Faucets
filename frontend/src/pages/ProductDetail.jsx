@@ -17,6 +17,10 @@ import {
 } from "../api/orderApi";
 
 import {
+    setPageSeo
+} from "../utils/seo.js";
+
+import {
     useAuth
 } from "../context/AuthContext";
 
@@ -68,7 +72,7 @@ function ProductDetail() {
                 setError("");
 
                 const response = await fetch(
-                    `http://localhost:3000/api/products/${id}`
+                    `/api/products/${id}`
                 );
 
 
@@ -400,6 +404,29 @@ function ProductDetail() {
 
     const isOutOfStock =
         product.stock <= 0;
+
+
+    useEffect(() => {
+        if (!product) return;
+
+        const productName = product.name_fa || "شیرآلات بهداشتی";
+        const seriesName = product.series_name_fa || "";
+        const finishName = product.series_finish_fa || "";
+        const title = [productName, seriesName, finishName, "شیرآلات ساحل"]
+            .filter(Boolean)
+            .join(" | ");
+
+        const description = (
+            product.description ||
+            `مشاهده مشخصات ${productName} از مجموعه شیرآلات بهداشتی ساحل، همراه با اطلاعات مدل و ویژگی‌های محصول.`
+        ).replace(/\s+/g, " ").slice(0, 160);
+
+        setPageSeo({
+            title,
+            description,
+            path: `/product/${id}`,
+        });
+    }, [product, id]);
 
 
     return (

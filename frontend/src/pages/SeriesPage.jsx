@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { setPageSeo } from "../utils/seo.js";
 
 
 function SeriesPage() {
@@ -14,6 +15,22 @@ function SeriesPage() {
     const [series, setSeries] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (!series) return;
+
+        const seriesName = series.name_fa || "شیرآلات بهداشتی";
+        const finishName = series.finish_fa || "";
+
+        setPageSeo({
+            title: [seriesName, finishName, "شیرآلات ساحل"]
+                .filter(Boolean)
+                .join(" | "),
+            description: `مشاهده مدل‌های سری ${seriesName}${finishName ? ` با پرداخت ${finishName}` : ""} از شیرآلات بهداشتی ساحل.`.slice(0, 160),
+            path: `/series/${seriesId}`,
+        });
+    }, [series, seriesId]);
+
 
     /*
      * -------------------------
@@ -79,7 +96,7 @@ function SeriesPage() {
                 setError(null);
 
                 const response = await fetch(
-                    `http://localhost:3000/api/series/${seriesId}`
+                    `/api/series/${seriesId}`
                 );
 
                 if (!response.ok) {
@@ -142,7 +159,7 @@ function SeriesPage() {
              */
 
             const response = await fetch(
-                `http://localhost:3000/api/series/${newId}`
+                `/api/series/${newId}`
             );
 
             if (!response.ok) {

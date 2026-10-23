@@ -11,10 +11,23 @@ import {
     getAllSeries
 } from "../api/seriesApi";
 
+import {
+    setPageSeo
+} from "../utils/seo.js";
+
 import "../styles/seriesList.css";
 
 
 function SeriesListPage() {
+
+    useEffect(() => {
+        setPageSeo({
+            title: "مجموعه و مدل‌های شیرآلات بهداشتی ساحل",
+            description: "مشاهده مجموعه سری‌های شیرآلات بهداشتی ساحل؛ بررسی مدل‌ها، رنگ‌ها و پرداخت‌های مختلف برای انتخاب شیرآلات مناسب.",
+            path: "/series",
+        });
+    }, []);
+
 
     const navigate = useNavigate();
 
